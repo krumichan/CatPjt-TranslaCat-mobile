@@ -1,0 +1,57 @@
+# EAS reads this file instead of .gitignore. Keep both exclusions aligned.
+
+# Dependencies and generated Expo/native projects
+node_modules/
+.expo/
+android/
+ios/
+expo-env.d.ts
+
+# Bundles, packages, caches and test results
+dist/
+build/
+web-build/
+coverage/
+.gradle/
+.kotlin/
+*.apk
+*.apks
+*.aab
+*.ipa
+*.xcarchive/
+*.dSYM/
+*.hprof
+*.log
+*.tsbuildinfo
+
+# Local environments and credentials; keep the public template
+.env*
+!.env.example
+.npmrc
+credentials.json
+google-services.json
+GoogleService-Info.plist
+*-firebase-adminsdk-*.json
+service-account*.json
+service_account*.json
+build-settings.json
+signing.json
+local.properties
+*.key
+*.pem
+*.p8
+*.p12
+*.pfx
+*.mobileprovision
+*.keystore
+*.jks
+
+# Local editor/system state and workspace-only verification
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+/.codex-workspace/
+
+# Version-control metadata is not part of the build archive
+.git/

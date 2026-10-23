@@ -1,0 +1,19 @@
+# Keep source files consistent across Windows, macOS and the build runner.
+* text=auto eol=lf
+
+# Preserve binary assets and install packages byte for byte.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.mp4 binary
+*.apk binary
+*.aab binary
+*.ipa binary
