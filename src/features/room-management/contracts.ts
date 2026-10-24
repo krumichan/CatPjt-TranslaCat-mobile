@@ -1,5 +1,6 @@
 import { ChatContractError, flag, optionalId, record, safeId, text, wireId } from "../../domain/chat/contracts.ts";
 import type { ChatRoom } from "../../domain/chat/types.ts";
+import { profileImageUrl } from "../../domain/chat/profile-image-url.ts";
 
 export type ManagedRoom = ChatRoom & { closed?: boolean };
 
@@ -11,6 +12,7 @@ export interface RoomMember {
   memberCode: string | null;
   role: MemberRole;
   active: boolean;
+  profileImageUrl?: string | null;
 }
 export interface RoomBan {
   id: string;
@@ -32,7 +34,8 @@ export function parseOpenMember(value: unknown): RoomMember {
   const dto = record(value);
   // 방 전용 신원만 사용한다. 서버가 실수로 추가한 계정 ID/이메일은 복사하지 않는다.
   return { id: safeId(dto.openChatMemberId), displayName: text(dto.nickname), publicId: null,
-    memberCode: text(dto.memberCode), role: role(dto.role), active: flag(dto.active) };
+    memberCode: text(dto.memberCode), role: role(dto.role), active: flag(dto.active),
+    ...(dto.profileImageUrl !== undefined ? { profileImageUrl: profileImageUrl(dto.profileImageUrl) } : {}) };
 }
 
 export function parseMembers(value: unknown, roomId: string, open: boolean): RoomMember[] {

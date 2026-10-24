@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleShee
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/ui/theme";
+import { ProfileAvatar } from "@/ui/ProfileAvatar";
 
 export function ManagementCard({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
   return <View style={styles.card}>
@@ -29,14 +30,12 @@ export function ManagementMessage({ error, notice }: { error?: string | null; no
   </>;
 }
 
-export function ParticipantIdentity({ name, detail, role, mine = false, active = true }: {
-  name: string; detail?: string | null; role?: string; mine?: boolean; active?: boolean;
+export function ParticipantIdentity({ name, detail, role, mine = false, active = true, imageUrl }: {
+  name: string; detail?: string | null; role?: string; mine?: boolean; active?: boolean; imageUrl?: string | null;
 }) {
   const roleLabel = role === "OWNER" ? "방장" : role === "ADMIN" ? "관리자" : "참여자";
   return <View style={styles.identity}>
-    <View style={styles.avatar} accessible={false}>
-      <Text style={styles.avatarText}>{Array.from(name)[0] || "참"}</Text>
-    </View>
+    <ProfileAvatar name={name} imageUrl={imageUrl} />
     <View style={styles.identityCopy}>
       <View style={styles.nameRow}>
         <Text style={styles.name}>{name}{mine ? " (나)" : ""}</Text>

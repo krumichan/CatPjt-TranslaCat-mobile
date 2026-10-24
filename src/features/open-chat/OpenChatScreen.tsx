@@ -155,8 +155,8 @@ export default function OpenChatScreen() {
             }} />}
           </View>
         )}
-      <InfoCard title="앱의 오픈채팅 기능을 차례로 넓혀가요">
-        공개방을 만들거나 검색해 참여할 수 있어요. 프로필 이미지와 방장·관리자 기능은 준비 중이에요.
+      <InfoCard title="방별 프로필로 편하게 대화해요">
+        공개방을 만들거나 검색해 참여할 수 있어요. 참여한 방의 메뉴에서 내 프로필 사진을 바꾸고, 권한에 따라 참여자와 방을 관리할 수 있어요.
       </InfoCard>
     </Screen>
   );

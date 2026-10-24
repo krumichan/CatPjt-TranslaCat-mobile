@@ -81,6 +81,8 @@ export default function ChatRoomScreen({ roomId }: { roomId: string }) {
           onBack={() => router.replace("/")} onRefresh={() => { void chat.refresh(); }} onLatest={goToLatest}
           onParticipants={state.authorityReady && state.room ? () => router.push(`/chat/${roomId}/members`) : undefined}
           onRoomManagement={state.authorityReady && state.room ? () => router.push(`/chat/${roomId}/manage`) : undefined}
+          onOpenProfile={state.authorityReady && state.room?.roomType === "OPEN" && state.room.active && !state.room.closed
+            ? () => router.push({ pathname: "/chat/[roomId]/profile", params: { roomId } }) : undefined}
           onAiSettings={state.authorityReady && state.room?.active && !state.room.closed && state.room.roomType !== "DIRECT" ? () => router.push(`/chat/${roomId}/ai`) : undefined} />
         {state.error && <Text accessibilityRole="alert" style={styles.error}>{state.error}</Text>}
         {state.loading ? <ActivityIndicator style={styles.loading} accessibilityLabel="대화 불러오는 중" color={colors.blue} /> : (

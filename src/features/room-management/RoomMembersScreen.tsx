@@ -86,7 +86,7 @@ export default function RoomMembersScreen({ roomId }: { roomId: string }) {
               const actions = memberActions(state.room, member, state.myMemberId);
               return <View key={member.id} style={styles.member}>
                 <ParticipantIdentity name={member.displayName} detail={member.memberCode ? `멤버 코드 ${member.memberCode}` : member.publicId ? `@${member.publicId}` : null}
-                  role={member.role} mine={member.id === state.myMemberId} active={member.active} />
+                  role={member.role} mine={member.id === state.myMemberId} active={member.active} imageUrl={member.profileImageUrl} />
                 <View style={styles.actions}>
                   {member.id !== state.myMemberId && member.active && <View style={styles.actionSlot}><ManagementAction label="참여자 신고" secondary disabled={disabled}
                     onPress={() => { if (isActive()) router.push({ pathname: "/chat/[roomId]/report", params: { roomId,

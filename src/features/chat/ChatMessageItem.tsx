@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { ChatLanguageSettings, ChatMessage, ChatRoomType } from "@/domain/chat/types";
 import { colors } from "@/ui/theme";
+import { ProfileAvatar } from "@/ui/ProfileAvatar";
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -35,6 +36,9 @@ export function ChatMessageItem({ message, currentUserId, currentOpenMemberId, r
     <View style={styles.messageItem}>
       {firstUnreadMessageId === message.id && <Text style={styles.unreadBoundary}>여기부터 읽지 않은 메시지</Text>}
       <View style={[styles.messageRow, mine && styles.mineRow, system && styles.systemRow]}>
+        {!system && !hidden && !message.authorDeleted && roomType === "OPEN" && message.senderType === "USER" && (
+          <ProfileAvatar name={senderName} imageUrl={message.sender?.profileImageUrl} size={32} />
+        )}
         {!system && !hidden && (message.senderType === "AI" && aiMemberId ? (
           <Pressable accessibilityRole="button" accessibilityLabel={`${senderName} AI 공개 프로필 보기`}
             onPress={() => onOpenAiProfile(aiMemberId)}>

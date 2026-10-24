@@ -13,9 +13,10 @@ interface HeaderProps {
   onAiSettings?: () => void;
   onParticipants?: () => void;
   onRoomManagement?: () => void;
+  onOpenProfile?: () => void;
 }
 
-export function ChatRoomHeader({ title, refreshing, onBack, onRefresh, onLatest, onAiSettings, onParticipants, onRoomManagement }: HeaderProps) {
+export function ChatRoomHeader({ title, refreshing, onBack, onRefresh, onLatest, onAiSettings, onParticipants, onRoomManagement, onOpenProfile }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = () => setMenuOpen(false);
   const select = (action: () => void) => { close(); action(); };
@@ -53,6 +54,9 @@ export function ChatRoomHeader({ title, refreshing, onBack, onRefresh, onLatest,
               </Pressable>}
               {onRoomManagement && <Pressable accessibilityRole="button" onPress={() => select(onRoomManagement)} style={styles.menuItem}>
                 <Text style={styles.menuLabel}>방 관리 · 초대</Text>
+              </Pressable>}
+              {onOpenProfile && <Pressable accessibilityRole="button" onPress={() => select(onOpenProfile)} style={styles.menuItem}>
+                <Text style={styles.menuLabel}>내 방별 프로필 · 사진</Text>
               </Pressable>}
               {onAiSettings && <Pressable accessibilityRole="button" onPress={() => select(onAiSettings)} style={styles.menuItem}>
                 <Text style={styles.menuLabel}>✦ AI와 대화 · 설정</Text>

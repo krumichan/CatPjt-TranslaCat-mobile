@@ -110,7 +110,7 @@ export default function OpenRoomCreateScreen() {
             <Button label="취소" secondary disabled={state.status === "submitting"} onPress={() => router.back()} />
           </View>
         )}
-      <InfoCard title="방별 프로필로 대화해요">공개 범위를 확인한 뒤 방을 만들어 주세요. 프로필 이미지와 방장 관리 기능은 차례로 연결할 예정이에요.</InfoCard>
+      <InfoCard title="방별 프로필로 대화해요">공개 범위를 확인한 뒤 방을 만들어 주세요. 사진은 방을 만든 후 대화방 메뉴의 ‘내 방별 프로필 · 사진’에서 선택할 수 있어요. 방장과 관리자는 방 메뉴에서 참여자를 관리할 수 있어요.</InfoCard>
     </Screen>
   );
 }
