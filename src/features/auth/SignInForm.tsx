@@ -7,6 +7,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { runtime } from "@/config/runtime";
 import { BackButton, BrandWordmark, Button, Screen } from "@/ui/components";
 import { colors } from "@/ui/theme";
+import { LegalLinks } from "./LegalLinks";
 
 function loginMessage(error: unknown) {
   if (!(error instanceof ApiError)) return "로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.";
@@ -142,7 +143,11 @@ export default function SignInForm() {
                 />
               </View>
             </View>
-            <Text style={styles.note}>이메일과 비밀번호가 있는 기존 계정도 사용할 수 있어요.</Text>
+            <View style={styles.accountLinks}>
+              <Button label="이메일로 가입하기" secondary disabled={busy || auth.status !== "signedOut"} onPress={() => { setPassword(""); router.push("/register"); }} />
+              <Button label="비밀번호 찾기" secondary disabled={busy || auth.status !== "signedOut"} onPress={() => { setPassword(""); router.push("/password-reset"); }} />
+            </View>
+            <LegalLinks />
           </View>
           {Platform.OS === "web" && <Text style={styles.note}>웹 미리보기에서는 창을 새로 열면 다시 로그인해 주세요.</Text>}
           <Text style={styles.footer}>TranslaCat · 함께 나누는 모든 언어</Text>
@@ -168,6 +173,7 @@ const styles = StyleSheet.create({
   dividerLine: { flex: 1, height: 1, backgroundColor: colors.line },
   dividerLabel: { color: colors.muted, fontSize: 12, lineHeight: 20, flexShrink: 1, textAlign: "center" },
   form: { marginTop: 20, gap: 9 },
+  accountLinks: { marginTop: 20, gap: 12 },
   label: { color: colors.ink, fontSize: 14, lineHeight: 21, fontWeight: "600" },
   input: { minHeight: 54, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 1, borderColor: colors.blueLine,
     borderRadius: 12, backgroundColor: colors.surface, color: colors.ink, fontSize: 16, marginBottom: 8 },

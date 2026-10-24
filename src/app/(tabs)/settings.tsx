@@ -10,6 +10,7 @@ import { accountIdentity, createIdentityActions } from "@/domain/identity";
 import { useNotifications } from "@/notifications/NotificationProvider";
 import { useActivityGate } from "@/realtime/useActivity";
 import { NotificationPreferenceControl } from "@/features/notification-preferences/NotificationPreferenceControl";
+import { LegalLinks } from "@/features/auth/LegalLinks";
 
 function AccountIdentity({ disabled }: { disabled: boolean }) {
   const auth = useAuth();
@@ -148,6 +149,7 @@ export default function SettingsScreen() {
           <ActionRow title="개발 점검" description="앱 설정과 알림 연결 준비 상태 확인" onPress={() => router.push("/dev/setup")} />
         </View>
       )}
+      <LegalLinks />
       <View style={styles.footer}>
         <BrandWordmark width={130} />
         <Text style={styles.footerTagline}>언어를 넘어, 대화를 잇다</Text>
