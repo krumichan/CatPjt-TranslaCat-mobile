@@ -176,7 +176,9 @@ function buildAppConfig(env = process.env) {
       ...(settings.googleServicesFile ? { googleServicesFile: settings.googleServicesFile } : {}),
     },
     web: { bundler: 'metro', output: 'static' },
-    plugins: ['expo-router', ['expo-notifications', { defaultChannel: 'chat-messages' }], 'expo-secure-store', 'expo-dev-client', 'expo-web-browser', './plugins/with-android-text-layout.cjs'],
+    plugins: ['expo-router', ['expo-notifications', { defaultChannel: 'chat-messages' }], 'expo-secure-store', 'expo-dev-client', 'expo-web-browser',
+      ['expo-image-picker', { photosPermission: '오픈채팅에서 사용할 프로필 사진을 선택해 주세요.', cameraPermission: false, microphonePermission: false }],
+      './plugins/with-android-text-layout.cjs'],
     experiments: { typedRoutes: true },
     extra: {
       appEnvironment: settings.appEnvironment,

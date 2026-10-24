@@ -42,7 +42,7 @@ export interface ChatMessage {
   translations: ChatTranslation[];
   createdAt: string;
   updatedAt: string;
-  sender: { openChatMemberId: string; nickname: string; memberCode: string } | null;
+  sender: { openChatMemberId: string; nickname: string; memberCode: string; profileImageUrl?: string | null } | null;
 }
 
 export interface MessagePage {
@@ -62,6 +62,7 @@ export interface OpenProfile {
   nickname: string;
   memberCode: string;
   joinedAt: string;
+  profileImageUrl?: string | null;
 }
 
 export interface OpenRoom {

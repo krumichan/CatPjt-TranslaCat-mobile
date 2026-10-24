@@ -19,6 +19,7 @@ export class ApiError extends Error {
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
+  formData?: FormData;
   authenticated?: boolean;
   signal?: AbortSignal;
 };
@@ -43,6 +44,10 @@ export function createApiClient({
       if (!path.startsWith("/") || path.startsWith("//")) {
         throw new ApiError(0, "INVALID_API_PATH");
       }
+      if (options.formData !== undefined && (options.body !== undefined
+        || typeof FormData === "undefined" || !(options.formData instanceof FormData))) {
+        throw new ApiError(0, "INVALID_MULTIPART_BODY");
+      }
       const base = new URL(baseUrl.replace(/\/$/, "") + "/");
       const url = new URL(path.slice(1), base);
       if (url.origin !== base.origin || !url.pathname.startsWith(base.pathname)
@@ -61,6 +66,7 @@ export function createApiClient({
         if (!token) throw new ApiError(401, "SIGN_IN_REQUIRED");
         headers.set("Authorization", "Bearer " + token);
       }
+      // multipart boundary는 네이티브 fetch가 파일과 함께 만든다. JSON 요청의 기존 헤더는 유지한다.
       if (options.body !== undefined) headers.set("Content-Type", "application/json");
 
       let response: Response;
@@ -68,7 +74,7 @@ export function createApiClient({
         response = await fetcher(url, {
           method: options.method ?? "GET",
           headers,
-          body: options.body === undefined ? undefined : JSON.stringify(options.body),
+          body: options.formData ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
           signal: options.signal,
           redirect: "error",
         });

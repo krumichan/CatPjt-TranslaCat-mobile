@@ -1,4 +1,5 @@
 import type { ChatLanguageSettings, ChatMessage, ChatRoom, ChatTranslation, MessagePage, OpenProfile, OpenRoom } from "./types.ts";
+import { profileImageUrl } from "./profile-image-url.ts";
 
 export class ChatContractError extends Error {
   readonly code: string;
@@ -103,13 +104,15 @@ export function parseMessage(value: unknown): ChatMessage {
     translations: dto.translations.map(parseTranslation), createdAt: text(dto.createdAt), updatedAt: text(dto.updatedAt),
     sender: sender ? {
       openChatMemberId: safeId(sender.openChatMemberId), nickname: text(sender.nickname), memberCode: text(sender.memberCode),
+      ...(sender.profileImageUrl !== undefined ? { profileImageUrl: profileImageUrl(sender.profileImageUrl) } : {}),
     } : null,
   };
   // 차단/운영 숨김은 원문·번역·프로필을 앱 메모리에도 합치지 않는다. 탈퇴 표시는 서버의 실명과 분리한다.
   if (visibility !== "VISIBLE") return { ...message, content: visibility === "BLOCKED" ? "차단한 사용자의 메시지입니다." : "운영 정책에 따라 숨겨진 메시지입니다.",
     translations: [], senderUserId: null, senderAiMemberId: null, senderName: null, sender: null };
   if (authorDeleted) return { ...message, senderUserId: null, senderName: "탈퇴한 사용자",
-    sender: message.sender ? { ...message.sender, nickname: "탈퇴한 사용자", memberCode: "" } : null };
+    sender: message.sender ? { ...message.sender, nickname: "탈퇴한 사용자", memberCode: "",
+      ...(message.sender.profileImageUrl !== undefined ? { profileImageUrl: null } : {}) } : null };
   return message;
 }
 
@@ -132,6 +135,7 @@ export function parseOpenProfile(value: unknown): OpenProfile {
   return {
     openChatMemberId: safeId(dto.openChatMemberId), nickname: text(dto.nickname),
     memberCode: text(dto.memberCode), joinedAt: text(dto.joinedAt),
+    ...(dto.profileImageUrl !== undefined ? { profileImageUrl: profileImageUrl(dto.profileImageUrl) } : {}),
   };
 }
 
