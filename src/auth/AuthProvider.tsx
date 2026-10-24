@@ -87,6 +87,7 @@ function useAuthState() {
   useEffect(() => { void session.restore(); }, [session]);
   return {
     ...snapshot, api, accessToken: session.accessToken, registerSessionRelease, isCurrentSession,
+    isCurrentSignedOutSession: session.isCurrentSignedOutBoundary,
     signIn: session.signIn, signOut: session.signOut, retryRestore: session.restore,
     signInWithGoogle: () => session.signInExternal(loginWithExistingWebsite),
   };

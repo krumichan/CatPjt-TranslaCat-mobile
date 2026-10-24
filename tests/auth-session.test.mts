@@ -236,7 +236,7 @@ for (const status of [401, 403]) {
     // 검증
     assert.equal(memory.value(), null);
     assert.deepEqual(session.getSnapshot(), {
-      status: "signedOut", user: null, sessionKey: null, error: "SESSION_EXPIRED", canRetryRestore: false,
+      status: "signedOut", user: null, sessionKey: null, boundaryGeneration: 1, error: "SESSION_EXPIRED", canRetryRestore: false,
     });
   });
 }

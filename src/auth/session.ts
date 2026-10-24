@@ -8,6 +8,7 @@ export type SessionSnapshot = {
   status: "restoring" | "signedOut" | "signedIn";
   user: SessionUser | null;
   sessionKey: string | null;
+  boundaryGeneration: number;
   error: string | null;
   canRetryRestore: boolean;
 };
@@ -39,7 +40,7 @@ function validatePair(pair: TokenPair, expectedPublicId?: string): TokenPair {
 
 export class AuthSession {
   private snapshot: SessionSnapshot = {
-    status: "restoring", user: null, sessionKey: null, error: null, canRetryRestore: false,
+    status: "restoring", user: null, sessionKey: null, boundaryGeneration: 0, error: null, canRetryRestore: false,
   };
   private generation = 0;
   private credentials: SessionCredentials | null = null;
@@ -64,14 +65,18 @@ export class AuthSession {
   }
 
   getSnapshot = (): SessionSnapshot => this.snapshot;
+  // signedOut/null도 서로 다른 로그인 시도·로그아웃 세대이므로 null 키 대신 실제 세대를 비교한다.
+  isCurrentSignedOutBoundary = (generation: number): boolean =>
+    this.generation === generation && this.snapshot.status === "signedOut";
+
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => { this.listeners.delete(listener); };
   };
 
-  private publish(next: SessionSnapshot) {
+  private publish(next: Omit<SessionSnapshot, "boundaryGeneration">) {
     if (this.snapshot.sessionKey !== next.sessionKey) this.onBoundary();
-    this.snapshot = next;
+    this.snapshot = { ...next, boundaryGeneration: this.generation };
     for (const listener of this.listeners) listener();
   }
 
