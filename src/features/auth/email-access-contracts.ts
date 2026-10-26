@@ -1,9 +1,24 @@
 import { ApiError } from "../../api/client.ts";
 
 export type EmailAccessMode = "register" | "reset";
+export type EmailAccessAction = "send" | "verify" | "complete";
 export type EmailAccessFields = {
   email: string; code: string; password: string; confirmation: string; nickname: string; birthDate: string;
 };
+
+export function emailAccessErrorField(failure: unknown): keyof EmailAccessFields | null {
+  // 서버 원문을 해석하지 않고 공개 계약의 허용된 오류 코드만 입력 위치에 연결한다.
+  if (!(failure instanceof ApiError)) return null;
+  const code = failure.serverCode;
+  if (code === "AUTH_EMAIL_INVALID" || code === "AUTH_EMAIL_ALREADY_REGISTERED"
+    || code === "ACCOUNT_ALREADY_EXISTS" || code === "ACCOUNT_LINK_REQUIRED") return "email";
+  if (code === "AUTH_PASSWORD_INVALID") return "password";
+  if (code === "AUTH_EMAIL_CODE_INVALID" || code === "AUTH_PASSWORD_RESET_INVALID"
+    || code === "AUTH_EMAIL_VERIFICATION_INVALID" || code === "AUTH_EMAIL_CODE_EXPIRED"
+    || code === "AUTH_EMAIL_CODE_UNAVAILABLE" || code === "AUTH_EMAIL_CODE_ATTEMPTS_EXCEEDED"
+    || code === "AUTH_EMAIL_CHALLENGE_REPLACED") return "code";
+  return null;
+}
 
 export function normalizedEmail(value: string): string | null {
   const email = value.trim().toLowerCase();
@@ -69,6 +84,8 @@ export function emailAccessMessage(failure: unknown): string {
   const code = failure.serverCode;
   if (failure.code === "API_NOT_CONFIGURED") return "서버 연결이 준비되면 이용할 수 있어요.";
   if (failure.status === 429) return "요청이 많아요. 안내된 시간이 지난 뒤 다시 시도해 주세요.";
+  if (code === "AUTH_EMAIL_INVALID") return "올바른 이메일 주소를 입력해 주세요.";
+  if (code === "AUTH_PASSWORD_INVALID") return "비밀번호는 8자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.";
   if (code === "AUTH_EMAIL_ALREADY_REGISTERED" || code === "ACCOUNT_ALREADY_EXISTS" || code === "ACCOUNT_LINK_REQUIRED") return "이미 사용하는 계정이 있어요. 기존 이메일 또는 Google로 로그인해 주세요.";
   if (code === "AUTH_EMAIL_CODE_INVALID") return "이메일로 받은 6자리 인증번호를 확인해 주세요.";
   if (code === "AUTH_EMAIL_UNAVAILABLE" || code === "AUTH_EMAIL_SEND_FAILED") return "인증 메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요.";

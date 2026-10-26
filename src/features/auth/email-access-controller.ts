@@ -1,21 +1,23 @@
 import { ApiError } from "../../api/client.ts";
 import {
-  emailAccessMessage, normalizedEmail, parseEmailChallenge, parseEmailCompletion, parseEmailProof,
-  validBirthDate, validNewPassword, type EmailAccessFields, type EmailAccessMode,
+  emailAccessErrorField, emailAccessMessage, normalizedEmail, parseEmailChallenge, parseEmailCompletion, parseEmailProof,
+  validBirthDate, validNewPassword, type EmailAccessAction, type EmailAccessFields, type EmailAccessMode,
 } from "./email-access-contracts.ts";
 
 type Request = (path: string, body: unknown, signal: AbortSignal) => Promise<unknown>;
 type State = EmailAccessFields & {
-  busy: "send" | "verify" | "complete" | null;
+  busy: EmailAccessAction | null;
   verified: boolean; expiresAt: number; cooldownUntil: number;
   error: string | null; message: string | null; completed: boolean;
+  errorField: keyof EmailAccessFields | null; errorAction: EmailAccessAction | null; errorRevision: number;
 };
 
 export function createEmailAccessController({ mode, request, current, now = Date.now, timeoutMs = 20000 }: {
   mode: EmailAccessMode; request: Request; current: () => boolean; now?: () => number; timeoutMs?: number;
 }) {
   let state: State = { email: "", code: "", password: "", confirmation: "", nickname: "", birthDate: "",
-    busy: null, verified: false, expiresAt: 0, cooldownUntil: 0, error: null, message: null, completed: false };
+    busy: null, verified: false, expiresAt: 0, cooldownUntil: 0, error: null, message: null, completed: false,
+    errorField: null, errorAction: null, errorRevision: 0 };
   let challengeId: string | null = null;
   let proof: string | null = null;
   let revision = 0;
@@ -24,6 +26,12 @@ export function createEmailAccessController({ mode, request, current, now = Date
   const publish = (patch: Partial<State>) => {
     state = { ...state, ...patch };
     listeners.forEach(listener => listener());
+  };
+
+  const clearedError = { error: null, errorField: null, errorAction: null };
+  const reportError = (error: string, errorField: keyof EmailAccessFields | null, errorAction: EmailAccessAction) => {
+    // 같은 오류를 다시 제출해도 화면이 해당 입력과 오류 안내로 이동할 수 있게 순번을 발행한다.
+    publish({ error, errorField, errorAction, errorRevision: state.errorRevision + 1, message: null });
   };
 
   const invalidate = () => {
@@ -42,7 +50,7 @@ export function createEmailAccessController({ mode, request, current, now = Date
     const cancelled = new Promise<never>((_, reject) => { cancel = () => reject(new ApiError(0, "REQUEST_ABORTED")); });
     pending = { abort, cancel };
     const timer = setTimeout(() => { abort.abort(); cancel(); }, timeoutMs);
-    publish({ busy: kind, error: null, message: null });
+    publish({ busy: kind, ...clearedError, message: null });
     try {
       const result = await Promise.race([request(path, body, abort.signal), cancelled]);
       if (ownedRevision === revision && current()) accept(result);
@@ -55,7 +63,7 @@ export function createEmailAccessController({ mode, request, current, now = Date
         proof = null;
         publish({ verified: false, password: "", confirmation: "" });
       }
-      publish({ error: emailAccessMessage(failure) });
+      reportError(emailAccessMessage(failure), emailAccessErrorField(failure), kind);
     } finally {
       clearTimeout(timer);
       if (ownedRevision === revision) {
@@ -86,13 +94,16 @@ export function createEmailAccessController({ mode, request, current, now = Date
         proof = null;
         publish({ verified: false, expiresAt: 0, code: "" });
       }
-      publish({ [field]: value, error: null });
+      // 다른 입력을 고쳐도 아직 해결하지 않은 오류는 유지한다. 확인 비밀번호와 원문은 함께 비교한다.
+      const clearsError = state.errorField === field
+        || field === "password" && state.errorField === "confirmation" && value === state.confirmation;
+      publish({ [field]: value, ...(clearsError ? clearedError : {}) });
     },
     tick,
     async send() {
       if (state.busy || state.completed || !current() || state.cooldownUntil > now()) return;
       const email = normalizedEmail(state.email);
-      if (!email) { publish({ error: "올바른 이메일 주소를 입력해 주세요." }); return; }
+      if (!email) { reportError("올바른 이메일 주소를 입력해 주세요.", "email", "send"); return; }
       challengeId = null;
       proof = null;
       // 네트워크 결과가 불명확해도 SMTP가 이미 실행됐을 수 있으므로 기본 대기 시간을 보존한다.
@@ -107,7 +118,7 @@ export function createEmailAccessController({ mode, request, current, now = Date
     async verify() {
       tick();
       if (state.busy || state.verified || !current()) return;
-      if (!challengeId || !/^[0-9]{6}$/.test(state.code)) { publish({ error: "메일을 요청한 뒤 6자리 인증번호를 입력해 주세요." }); return; }
+      if (!challengeId || !/^[0-9]{6}$/.test(state.code)) { reportError("메일을 요청한 뒤 6자리 인증번호를 입력해 주세요.", "code", "verify"); return; }
       await run("verify", mode === "register" ? "/auth/email/verify" : "/auth/password-reset/verify", { challengeId, code: state.code }, value => {
         const verified = parseEmailProof(value);
         proof = verified.verificationToken;
@@ -118,11 +129,14 @@ export function createEmailAccessController({ mode, request, current, now = Date
       tick();
       if (state.busy || state.completed || !current()) return;
       const email = normalizedEmail(state.email);
-      if (!email || !proof || !state.verified) { publish({ error: "먼저 이메일 인증을 완료해 주세요." }); return; }
-      if (!validNewPassword(state.password)) { publish({ error: "비밀번호는 8자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요." }); return; }
-      if (state.password !== state.confirmation) { publish({ error: "비밀번호 확인이 일치하지 않아요." }); return; }
-      if (mode === "register" && (!state.nickname.trim() || state.nickname.trim().length > 30 || !validBirthDate(state.birthDate, now()))) {
-        publish({ error: "닉네임(1~30자)과 생년월일(YYYY-MM-DD)을 확인해 주세요." }); return;
+      if (!email || !proof || !state.verified) { reportError("먼저 이메일 인증을 완료해 주세요.", !email ? "email" : "code", "complete"); return; }
+      if (!validNewPassword(state.password)) { reportError("비밀번호는 8자 이상, UTF-8 기준 72바이트 이하로 입력해 주세요.", "password", "complete"); return; }
+      if (state.password !== state.confirmation) { reportError("비밀번호 확인이 일치하지 않아요.", "confirmation", "complete"); return; }
+      if (mode === "register" && (!state.nickname.trim() || state.nickname.trim().length > 30)) {
+        reportError("닉네임은 1~30자로 입력해 주세요.", "nickname", "complete"); return;
+      }
+      if (mode === "register" && !validBirthDate(state.birthDate, now())) {
+        reportError("올바른 생년월일을 선택해 주세요.", "birthDate", "complete"); return;
       }
 
       // 증명은 메모리에만 두며 제출 시작과 함께 소유권을 넘긴다. 재사용·자동 로그인은 하지 않는다.
@@ -140,12 +154,13 @@ export function createEmailAccessController({ mode, request, current, now = Date
       });
     },
     suspend(reset = false) {
-      const interrupted = state.busy !== null;
+      const interrupted = state.busy;
       invalidate();
       if (reset) { challengeId = null; proof = null; }
       publish({ busy: null, password: "", confirmation: "", code: "",
         ...(reset ? { verified: false, expiresAt: 0 } : {}),
-        ...(interrupted ? { error: "요청 결과를 확인하지 못했어요. 가입·변경 중이었다면 로그인으로 먼저 확인해 주세요." } : {}) });
+        ...(interrupted ? { error: "요청 결과를 확인하지 못했어요. 가입·변경 중이었다면 로그인으로 먼저 확인해 주세요.",
+          errorField: null, errorAction: interrupted, errorRevision: state.errorRevision + 1, message: null } : {}) });
     },
   };
 }

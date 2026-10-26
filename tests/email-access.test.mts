@@ -6,7 +6,7 @@ import { ApiError, createApiClient } from "../src/api/client.ts";
 import { AuthSession, type TokenPair } from "../src/auth/session.ts";
 import { createEmailAccessController } from "../src/features/auth/email-access-controller.ts";
 import {
-  emailAccessMessage, normalizedEmail, parseEmailChallenge, parseEmailProof,
+  emailAccessErrorField, emailAccessMessage, normalizedEmail, parseEmailChallenge, parseEmailProof,
   validBirthDate, validNewPassword, type EmailAccessMode,
 } from "../src/features/auth/email-access-contracts.ts";
 import { publicPolicyUrl } from "../src/features/auth/policy-links.ts";
@@ -154,6 +154,150 @@ test("unmatched password or invalid birthdate does not consume valid proof", asy
   f.controller.setField("birthDate", "2000-02-29");
   await f.controller.complete();
   assert.equal(f.controller.getSnapshot().completed, true);
+});
+
+test("registration reports the first invalid field without changing validation order or consuming proof", async () => {
+  // 준비: 여러 항목이 함께 잘못됐을 때도 기존 인증·비밀번호 우선순위를 유지한다.
+  const f = fixture();
+  await f.controller.complete();
+  assert.equal(f.controller.getSnapshot().errorField, "code");
+  assert.equal(f.controller.getSnapshot().errorAction, "complete");
+  await f.verify();
+  f.controller.setField("password", "short");
+  f.controller.setField("confirmation", "different-password");
+
+  // 실행 및 검증: 입력 오류를 순서대로 고친 뒤 같은 유효 증명으로 한 번만 가입한다.
+  for (const [field, value] of [
+    ["password", "synthetic-password"], ["confirmation", "synthetic-password"],
+    ["nickname", "synthetic"], ["birthDate", "2000-02-29"],
+  ] as const) {
+    await f.controller.complete();
+    const state = f.controller.getSnapshot();
+    assert.equal(state.errorField, field);
+    assert.equal(state.errorAction, "complete");
+    assert.equal(state.verified, true);
+    assert.equal(f.calls.length, 2);
+    f.controller.setField(field, value);
+  }
+  await f.controller.complete();
+  assert.equal(f.calls.length, 3);
+  assert.equal(f.controller.getSnapshot().completed, true);
+});
+
+for (const mode of ["register", "reset"] as const) {
+  test(`${mode}: repeated validation errors get a new announcement revision at the same field`, async () => {
+    // 준비
+    const f = fixture(mode);
+    await f.verify();
+    f.details();
+    f.controller.setField("confirmation", "different-password");
+
+    // 실행: 같은 제출을 다시 눌러도 오류 안내·스크롤을 재실행할 순번을 발행한다.
+    await f.controller.complete();
+    const first = f.controller.getSnapshot();
+    await f.controller.complete();
+    const second = f.controller.getSnapshot();
+
+    // 검증: 비밀번호 불일치는 두 흐름 모두 확인 입력에 연결하며 증명을 잃지 않는다.
+    assert.equal(first.errorField, "confirmation");
+    assert.equal(first.errorAction, "complete");
+    assert.equal(second.error, first.error);
+    assert.equal(second.errorRevision, first.errorRevision + 1);
+    assert.equal(second.verified, true);
+    assert.equal(f.calls.length, 2);
+  });
+}
+
+test("unrelated edits keep a mismatch visible and matching either password clears its related error", async () => {
+  // 준비
+  const f = fixture();
+  await f.verify();
+  f.details();
+  f.controller.setField("confirmation", "different-password");
+  await f.controller.complete();
+  const before = f.controller.getSnapshot();
+
+  // 실행 및 검증: 다른 입력·여전히 다른 비밀번호를 고쳐도 확인란의 오류는 남는다.
+  f.controller.setField("nickname", "another-name");
+  f.controller.setField("password", "still-different-password");
+  assert.equal(f.controller.getSnapshot().error, before.error);
+  assert.equal(f.controller.getSnapshot().errorField, "confirmation");
+  assert.equal(f.controller.getSnapshot().errorRevision, before.errorRevision);
+  f.controller.setField("password", "different-password");
+  assert.equal(f.controller.getSnapshot().error, null);
+  assert.equal(f.controller.getSnapshot().errorField, null);
+  assert.equal(f.controller.getSnapshot().errorAction, null);
+  assert.equal(f.controller.getSnapshot().verified, true);
+});
+
+for (const { action, serverCode, field } of [
+  { action: "send", serverCode: "AUTH_EMAIL_INVALID", field: "email" },
+  { action: "verify", serverCode: "AUTH_EMAIL_CODE_INVALID", field: "code" },
+  { action: "complete", serverCode: "AUTH_EMAIL_ALREADY_REGISTERED", field: "email" },
+  { action: "complete", serverCode: "AUTH_PASSWORD_INVALID", field: "password" },
+  { action: "complete", serverCode: "AUTH_PASSWORD_RESET_INVALID", field: "code" },
+] as const) {
+  test(`server ${serverCode} is shown at ${field} and its ${action} action`, async () => {
+    // 준비: 정상 앞 단계를 거친 뒤 선택한 요청만 공개 오류 코드로 실패시킨다.
+    const f = fixture("register", async path => {
+      const step = path.endsWith("/challenges") ? "send" : path.endsWith("/verify") ? "verify" : "complete";
+      if (step === action) throw new ApiError(400, "HTTP_ERROR", serverCode);
+      return step === "send" ? challenge : proof;
+    });
+
+    // 실행
+    await f.controller.send();
+    if (action !== "send") {
+      f.controller.setField("code", "123456");
+      await f.controller.verify();
+    }
+    if (action === "complete") { f.details(); await f.controller.complete(); }
+
+    // 검증: 전역 배너만으로 끝내지 않고 실제 필드와 요청 버튼에 같은 오류를 연결한다.
+    const state = f.controller.getSnapshot();
+    assert.equal(state.errorField, field);
+    assert.equal(state.errorAction, action);
+    assert.ok(state.error);
+    assert.equal(state.errorRevision, 1);
+    assert.equal(state.busy, null);
+    assert.equal(state.completed, false);
+    assert.equal(state.message, null);
+  });
+}
+
+test("unknown request failure stays at the attempted action and a successful retry clears all error targets", async () => {
+  // 준비: 전송 결과를 모르는 오류에는 잘못된 입력을 임의 지정하지 않는다.
+  let failing = true;
+  const f = fixture("register", async () => {
+    if (failing) throw new Error("private synthetic server detail");
+    return challenge;
+  });
+
+  // 실행 및 검증: 다른 입력을 편집해도 오류가 사라지지 않으며 기본 재발송 대기를 보존한다.
+  await f.controller.send();
+  assert.equal(f.controller.getSnapshot().errorField, null);
+  assert.equal(f.controller.getSnapshot().errorAction, "send");
+  assert.equal(f.controller.getSnapshot().error?.includes("private"), false);
+  f.controller.setField("nickname", "synthetic");
+  assert.ok(f.controller.getSnapshot().error);
+  await f.controller.send();
+  assert.equal(f.calls.length, 1);
+  f.advance(60000);
+  failing = false;
+  await f.controller.send();
+  assert.equal(f.calls.length, 2);
+  assert.equal(f.controller.getSnapshot().error, null);
+  assert.equal(f.controller.getSnapshot().errorField, null);
+  assert.equal(f.controller.getSnapshot().errorAction, null);
+  assert.ok(f.controller.getSnapshot().message);
+});
+
+test("only allowlisted public error codes select a field", () => {
+  // 실행 및 검증: 임의 서버 원문이나 미등록 코드를 필드 식별자로 사용하지 않는다.
+  assert.equal(emailAccessErrorField(new Error("password")), null);
+  assert.equal(emailAccessErrorField(new ApiError(400, "HTTP_ERROR", "private synthetic code")), null);
+  assert.equal(emailAccessErrorField(new ApiError(400, "HTTP_ERROR", "ACCOUNT_LINK_REQUIRED")), "email");
+  assert.equal(emailAccessErrorField(new ApiError(400, "HTTP_ERROR", "AUTH_EMAIL_CHALLENGE_REPLACED")), "code");
 });
 
 test("background cancels pending request, clears passwords and ignores late replies without losing cooldown", async () => {
