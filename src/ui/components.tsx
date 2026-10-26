@@ -76,12 +76,14 @@ export function Button({
   secondary = false,
   disabled = false,
   leading,
+  maxFontSizeMultiplier,
 }: {
   label: string;
   onPress: () => void;
   secondary?: boolean;
   disabled?: boolean;
   leading?: ReactNode;
+  maxFontSizeMultiplier?: number;
 }) {
   return (
     <Pressable
@@ -97,7 +99,7 @@ export function Button({
       ]}
     >
       {leading && <View accessible={false} importantForAccessibility="no-hide-descendants">{leading}</View>}
-      <Text style={[styles.buttonLabel, secondary && styles.secondaryButtonLabel]}>{label}</Text>
+      <Text maxFontSizeMultiplier={maxFontSizeMultiplier} style={[styles.buttonLabel, secondary && styles.secondaryButtonLabel]}>{label}</Text>
     </Pressable>
   );
 }

@@ -164,6 +164,8 @@ export default function EmailAccessScreen({ mode }: { mode: EmailAccessMode }) {
               {mode === "reset" && <Text style={styles.help}>변경이 끝나면 기존 로그인은 해제돼요. 새 비밀번호로 다시 로그인해 주세요.</Text>}
             </>
           )}
+          {/* 긴 안내는 본문과 함께 확대·스크롤하고, 고정 영역에는 완료 동작만 남긴다. */}
+          {!state.completed && !state.error && !state.verified && <Text style={styles.help}>이메일 인증 후 {mode === "register" ? "가입을 완료" : "비밀번호를 변경"}할 수 있어요.</Text>}
         </View>
         <LegalLinks />
       </View>
@@ -179,8 +181,7 @@ export default function EmailAccessScreen({ mode }: { mode: EmailAccessMode }) {
               <Text style={styles.errorLink}>입력 위치 확인 ↑</Text>
             </Pressable>}
           </ScrollView>}
-          {!state.completed && !state.error && !state.verified && <Text style={styles.help}>이메일 인증 후 {mode === "register" ? "가입을 완료" : "비밀번호를 변경"}할 수 있어요.</Text>}
-          <Button label={state.completed ? "로그인으로 돌아가기" : state.busy === "complete" ? "처리 중…" : mode === "register" ? "가입 완료하기" : "비밀번호 변경하기"}
+          <Button maxFontSizeMultiplier={2} label={state.completed ? "로그인으로 돌아가기" : state.busy === "complete" ? "처리 중…" : mode === "register" ? "가입 완료하기" : "비밀번호 변경하기"}
             disabled={!state.completed && (locked || !state.verified)}
             onPress={state.completed ? () => { controller.suspend(true); router.replace("/sign-in"); } : () => void controller.complete()} />
         </View>
