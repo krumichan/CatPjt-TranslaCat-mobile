@@ -176,9 +176,11 @@ if (localAutolinking.exists()) {
   const output = path.join(artifacts, `translacat-dev-local-${stamp}-arm64.apk`);
   fs.copyFileSync(apk, output);
   for (const source of sources) if (hash(path.join(repoRoot, source.path)) !== source.sha256) throw new Error(`Source changed during native build: ${source.path}`);
-  const receipt = { builtAt: new Date().toISOString(), apk: output, sha256: hash(output), bytes: fs.statSync(output).size,
+  const receipt = {
+    builtAt: new Date().toISOString(), apk: output, sha256: hash(output), bytes: fs.statSync(output).size,
     certificateSha256: settings.certificateSha256, signatureVerified: true, package: "com.krumichan.translacat.dev",
-    architecture: "arm64-v8a", sourceCount: sources.length, cloudBuild: false, deviceInstallVerified: false };
+    architecture: "arm64-v8a", sourceCount: sources.length, cloudBuild: false, deviceInstallVerified: false
+  };
   fs.writeFileSync(path.join(taskRoot, "apk-built.json"), JSON.stringify(receipt, null, 2));
   console.log(JSON.stringify(receipt, null, 2));
 }
