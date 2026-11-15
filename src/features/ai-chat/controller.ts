@@ -38,8 +38,10 @@ export function manager(room: ChatRoom | null): boolean {
 }
 
 export function emptyAiRoom(): AiRoomState {
-  return { room: null, settings: null, members: [], loading: true, busy: false,
-    managementAvailable: false, uncertain: false, accessLost: false, revision: 0, error: null, notice: null };
+  return {
+    room: null, settings: null, members: [], loading: true, busy: false,
+    managementAvailable: false, uncertain: false, accessLost: false, revision: 0, error: null, notice: null
+  };
 }
 
 export function aiErrorMessage(error: unknown): string {
@@ -85,10 +87,12 @@ export function createAiRoomController(service: AiService, roomId: string, scope
     pendingRefresh = false;
     cancelTimer();
     disconnect();
-    update({ room, settings: null, members: [], managementAvailable: false, loading: false,
+    update({
+      room, settings: null, members: [], managementAvailable: false, loading: false,
       accessLost: room === null, error: null,
       notice: room?.closed ? "종료된 오픈채팅이에요. AI 설정을 변경할 수 없어요."
-        : "이 방에 더 이상 참여하고 있지 않아요. 대화방 목록에서 참여 상태를 확인해 주세요." });
+        : "이 방에 더 이상 참여하고 있지 않아요. 대화방 목록에서 참여 상태를 확인해 주세요."
+    });
   };
   const roomDenied = (error: unknown) => error instanceof ApiError && [400, 403, 404].includes(error.status);
   const sameRevision = (expected: number) => live() && revision === expected;
@@ -96,7 +100,7 @@ export function createAiRoomController(service: AiService, roomId: string, scope
     // 응답이 영원히 오지 않거나 fetch가 취소를 무시해도 작업 세대가 대기 상태에 갇히지 않게 한다.
     const cancellation = new AbortController();
     let finished = false;
-    let cancelDeadline = () => {};
+    let cancelDeadline = () => { };
     const finish = (success: boolean, result: T | unknown) => {
       if (finished) return;
       finished = true;
@@ -122,7 +126,7 @@ export function createAiRoomController(service: AiService, roomId: string, scope
     if (!live() || reading || state.busy) return;
     if (timer && (timer.kind === "refresh" || kind === "poll")) return;
     cancelTimer();
-    const owned = { cancel: () => {}, kind };
+    const owned = { cancel: () => { }, kind };
     timer = owned;
     owned.cancel = schedule(() => {
       if (timer !== owned) return;
@@ -143,7 +147,7 @@ export function createAiRoomController(service: AiService, roomId: string, scope
     if (!options.connect || stopSocket || !live()) return;
     const owned = ++socketGeneration;
     const connected = () => live() && owned === socketGeneration;
-    stopSocket = () => {};
+    stopSocket = () => { };
     try {
       const stop = options.connect({
         open: room.roomType === "OPEN",
@@ -275,8 +279,10 @@ export function createAiRoomController(service: AiService, roomId: string, scope
         else { failures++; update({ error: aiErrorMessage(error) }); }
       }
       else if (revision === expected) {
-        if (sent && !rejected) update({ uncertain: true,
-          notice: "저장 결과를 확인하지 못했어요. 이미 반영됐을 수 있으니 목록을 다시 확인해 주세요. 자동으로 다시 요청하지 않아요." });
+        if (sent && !rejected) update({
+          uncertain: true,
+          notice: "저장 결과를 확인하지 못했어요. 이미 반영됐을 수 있으니 목록을 다시 확인해 주세요. 자동으로 다시 요청하지 않아요."
+        });
         if (error instanceof ApiError && [400, 403, 404].includes(error.status)) {
           // 변경 거절의 400은 강퇴로 단정하지 않고 현재 방 GET으로 권한을 다시 확인한다.
           requestRefresh();

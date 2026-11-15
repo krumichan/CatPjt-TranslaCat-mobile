@@ -32,7 +32,7 @@ export function useChatScroll(options: ScrollOptions, list: RefObject<FlatList<C
   const attempts = useRef(0);
   const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
   const frame = useRef<number | null>(null);
-  const tryPosition = useRef<() => void>(() => {});
+  const tryPosition = useRef<() => void>(() => { });
   const lastMessageId = messages[messages.length - 1]?.id ?? null;
   const previousLastId = useRef(lastMessageId);
   const [follow] = useState(() => new ChatScrollFollow({

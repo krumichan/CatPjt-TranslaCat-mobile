@@ -23,7 +23,8 @@ export function useUserBlocks() {
   useEffect(() => {
     if (!active || status !== "signedIn" || !sessionKey || !selfId) return;
     const isCurrent = () => current.current === owner && isActive() && isCurrentSession(sessionKey);
-    const owned = createUserBlockController({ service, selfId, isCurrent,
+    const owned = createUserBlockController({
+      service, selfId, isCurrent,
       onChange: state => { if (isCurrent()) setValue({ owner, state }); },
       onRelationshipsChanged: () => {
         if (!isCurrent()) return;

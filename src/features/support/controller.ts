@@ -24,8 +24,10 @@ export type SupportRevisions = Pick<SupportState, "createRevision" | "replyRevis
 
 // 화면 복귀로 새 통신 컨트롤러가 생겨도 같은 작업 화면의 성공 번호는 계속 증가한다.
 export function withSupportRevisionOffset(state: SupportState, offset: SupportRevisions): SupportState {
-  return { ...state, createRevision: offset.createRevision + state.createRevision,
-    replyRevision: offset.replyRevision + state.replyRevision };
+  return {
+    ...state, createRevision: offset.createRevision + state.createRevision,
+    replyRevision: offset.replyRevision + state.replyRevision
+  };
 }
 
 export function supportError(error: unknown): string {
@@ -40,7 +42,7 @@ export function supportError(error: unknown): string {
   return "연결 또는 문의 응답을 확인하지 못했어요. 다시 확인해 주세요.";
 }
 
-export function createSupportController({ service, isCurrent, onChange, initialUncertain = null, onUncertainChange = () => {}, requestTimeoutMs = 15000 }: {
+export function createSupportController({ service, isCurrent, onChange, initialUncertain = null, onUncertainChange = () => { }, requestTimeoutMs = 15000 }: {
   service: SupportService;
   isCurrent: () => boolean;
   onChange: (state: SupportState) => void;
@@ -67,7 +69,7 @@ export function createSupportController({ service, isCurrent, onChange, initialU
   const request = async <T>(action: (signal: AbortSignal) => Promise<T>): Promise<T> => {
     const owned = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let abort: () => void = () => {};
+    let abort: () => void = () => { };
     const interrupted = new Promise<never>((_resolve, reject) => {
       abort = () => { owned.abort(); reject(new Error("SUPPORT_REQUEST_INTERRUPTED")); };
       if (cancellation.signal.aborted) abort();

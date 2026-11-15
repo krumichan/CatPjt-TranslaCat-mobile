@@ -22,8 +22,10 @@ export default function ReportScreen({ roomId, target }: { roomId: string; targe
   useEffect(() => {
     let alive = true;
     const service = createReportService(api);
-    const owned = createReportController({ roomId, create: service.create, requestId: Crypto.randomUUID,
-      isCurrent: () => alive && isActive() && isCurrentSession(sessionKey), onChange: setState });
+    const owned = createReportController({
+      roomId, create: service.create, requestId: Crypto.randomUUID,
+      isCurrent: () => alive && isActive() && isCurrentSession(sessionKey), onChange: setState
+    });
     controller.current = owned;
     return () => {
       alive = false;

@@ -36,8 +36,10 @@ export function NotificationPreferenceControl({ roomId, disabled = false }: { ro
 
 const styles = StyleSheet.create({
   body: { gap: 12 },
-  toggle: { minHeight: 64, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: colors.blueLine,
-    backgroundColor: colors.background, flexDirection: "row", gap: 14, alignItems: "center" },
+  toggle: {
+    minHeight: 64, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: colors.blueLine,
+    backgroundColor: colors.background, flexDirection: "row", gap: 14, alignItems: "center"
+  },
   copy: { flex: 1, minWidth: 0, gap: 4 },
   title: { color: colors.ink, fontSize: 15, lineHeight: 23, fontWeight: "700", flexShrink: 0 },
   value: { color: colors.blueDark, fontSize: 13, lineHeight: 21 },

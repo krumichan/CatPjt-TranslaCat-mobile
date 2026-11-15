@@ -9,7 +9,7 @@ export interface SelectedProfileImage {
   height: number;
 }
 
-export class ProfileImageInputError extends Error {}
+export class ProfileImageInputError extends Error { }
 
 export function selectedProfileImage(input: {
   uri: string; mimeType: string | null | undefined; size: number; width: number; height: number;
@@ -27,6 +27,8 @@ export function selectedProfileImage(input: {
   if (![input.width, input.height].every(value => Number.isFinite(value) && value > 0)) {
     throw new ProfileImageInputError("사진의 크기를 확인할 수 없어요. 다른 사진을 선택해 주세요.");
   }
-  return { uri: input.uri, mimeType: input.mimeType as SelectedProfileImage["mimeType"], fileName: `profile.${extension}`,
-    size: input.size, width: input.width, height: input.height };
+  return {
+    uri: input.uri, mimeType: input.mimeType as SelectedProfileImage["mimeType"], fileName: `profile.${extension}`,
+    size: input.size, width: input.width, height: input.height
+  };
 }

@@ -11,7 +11,7 @@ export const emptyNotificationPreference = (): NotificationPreferenceState => ({
   value: null, loading: true, saving: false, uncertain: false, error: null, notice: null,
 });
 
-export function createNotificationPreferenceController({ read, write, isCurrent, onConfirmed = () => {}, onChange, timeoutMs = 15000 }: {
+export function createNotificationPreferenceController({ read, write, isCurrent, onConfirmed = () => { }, onChange, timeoutMs = 15000 }: {
   read: (signal: AbortSignal) => Promise<boolean>;
   write: (value: boolean, signal: AbortSignal) => Promise<boolean>;
   isCurrent: () => boolean;
@@ -85,8 +85,10 @@ export function createNotificationPreferenceController({ read, write, isCurrent,
       } catch {
         if (!current(owned)) return;
         // 화면은 마지막 확인 값으로 되돌리고, 서버 반영 여부는 GET으로 확인한다.
-        update({ value: previous, loading: false, saving: false, uncertain: true,
-          error: "저장 결과를 확인하지 못했어요. 설정을 다시 불러와 실제 값을 확인해 주세요.", notice: null });
+        update({
+          value: previous, loading: false, saving: false, uncertain: true,
+          error: "저장 결과를 확인하지 못했어요. 설정을 다시 불러와 실제 값을 확인해 주세요.", notice: null
+        });
       }
     },
     dispose() { disposed = true; revision++; cancel(); },

@@ -30,7 +30,7 @@ export function createChatService(api: ReturnType<typeof createApiClient>) {
       const seenRooms = new Set<string>();
 
       // 미읽음 수로 위치를 추측하지 않고 서버가 계산한 첫 미읽음 ID를 찾는다.
-      for (;;) {
+      for (; ;) {
         const query = new URLSearchParams({ size: "50" });
         if (cursor) query.set("cursorMessageId", String(wireId(cursor)));
         const dto = record(await api.request(`/chat/notifications/chats?${query.toString()}`, { signal }));

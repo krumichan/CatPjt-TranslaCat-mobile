@@ -30,7 +30,7 @@ export function createAttentionService(api: ReturnType<typeof createApiClient>, 
     async summary(signal?: AbortSignal): Promise<NotificationAttention> {
       const cancellation = new AbortController();
       let timer: ReturnType<typeof setTimeout> | undefined;
-      let abort = () => {};
+      let abort = () => { };
       // 토큰 복원 대기도 제한하고, 늦게 끝난 이전 요청은 결과로 사용하지 않는다.
       const deadline = new Promise<never>((_, reject) => {
         abort = () => { cancellation.abort(); reject(new ApiError(0, "REQUEST_ABORTED")); };

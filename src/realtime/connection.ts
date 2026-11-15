@@ -55,7 +55,7 @@ export function connectRoom({ apiBaseUrl, roomId, open, accessToken, onEvent, on
   const configuration: StompConfig = {
     brokerURL: chatSocketUrl(apiBaseUrl), reconnectDelay: 3000, connectionTimeout: 10000,
     heartbeatIncoming: 0, heartbeatOutgoing: 10000,
-    debug: () => {},
+    debug: () => { },
     beforeConnect: async () => {
       if (disposed || terminal) { void client.deactivate(); return; }
       // 재연결마다 현재 세션의 토큰을 받는다. JWT를 URL이나 로그에 넣지 않는다.
@@ -74,7 +74,7 @@ export function connectRoom({ apiBaseUrl, roomId, open, accessToken, onEvent, on
         client.connectHeaders = {};
         onStatus("RETRYING");
         const delayMs = Math.min(3000 * 2 ** Math.min(failures++, 4), 30000);
-        void client.deactivate().catch(() => {}).then(() => {
+        void client.deactivate().catch(() => { }).then(() => {
           if (disposed || terminal) return;
           cancelRetry?.();
           cancelRetry = retryLater(() => {

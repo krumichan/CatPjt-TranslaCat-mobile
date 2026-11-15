@@ -43,8 +43,10 @@ export default function AccountDeletionScreen() {
       storage: storage(),
       current: () => alive,
       onChange: setState,
-      createReceipt: async publicId => parseDeletionReceipt({ operationId: Crypto.randomUUID(), receiptSecret: receiptSecret(await Crypto.getRandomBytesAsync(32)),
-        expectedPublicId: publicId, returnScheme: runtime.environment === "production" ? "translacat" : runtime.environment === "preview" ? "translacat-preview" : "translacat-dev" }),
+      createReceipt: async publicId => parseDeletionReceipt({
+        operationId: Crypto.randomUUID(), receiptSecret: receiptSecret(await Crypto.getRandomBytesAsync(32)),
+        expectedPublicId: publicId, returnScheme: runtime.environment === "production" ? "translacat" : runtime.environment === "preview" ? "translacat-preview" : "translacat-dev"
+      }),
       readStatus: (receipt, signal) => anonymous.request("/account-deletion/status", {
         authenticated: false, method: "POST", signal, body: { operationId: receipt.operationId, receiptSecret: receipt.receiptSecret },
       }),

@@ -14,8 +14,10 @@ export interface InvitationPreviewState {
   error: string | null;
   notice: string | null;
 }
-export const emptyInvitationPreview = (): InvitationPreviewState => ({ invitation: null, room: null,
-  loading: true, busy: false, uncertain: false, error: null, notice: null });
+export const emptyInvitationPreview = (): InvitationPreviewState => ({
+  invitation: null, room: null,
+  loading: true, busy: false, uncertain: false, error: null, notice: null
+});
 const uncertainJoins = new Set<string>();
 
 export function invitationError(error: unknown) {
@@ -53,10 +55,12 @@ export function createInvitationPreviewController(invitations: OpenInvitationSer
       abort.signal.addEventListener("abort", rejectOnAbort, { once: true });
       timer = setTimeout(() => abort.abort(), timeoutMs);
     });
-    try { return await Promise.race([Promise.resolve().then(() => {
-      if (!current() || abort.signal.aborted) throw new ApiError(0, "REQUEST_ABORTED");
-      return work(abort.signal);
-    }), cancelled]); }
+    try {
+      return await Promise.race([Promise.resolve().then(() => {
+        if (!current() || abort.signal.aborted) throw new ApiError(0, "REQUEST_ABORTED");
+        return work(abort.signal);
+      }), cancelled]);
+    }
     finally { clearTimeout(timer!); abort.signal.removeEventListener("abort", rejectOnAbort!); requests.delete(abort); }
   }
   async function fetchPreview(version: number) {
@@ -116,8 +120,10 @@ export function createInvitationPreviewController(invitations: OpenInvitationSer
     } catch (error) {
       const rejected = error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 408;
       if (attempted && !rejected) uncertainJoins.add(scope);
-      if (current() && version === revision) update({ uncertain: uncertainJoins.has(scope), error: invitationError(error),
-        notice: attempted && !rejected ? "참여 결과를 확인하지 못했어요. 자동으로 다시 요청하지 않아요. 참여 상태를 먼저 확인해 주세요." : null });
+      if (current() && version === revision) update({
+        uncertain: uncertainJoins.has(scope), error: invitationError(error),
+        notice: attempted && !rejected ? "참여 결과를 확인하지 못했어요. 자동으로 다시 요청하지 않아요. 참여 상태를 먼저 확인해 주세요." : null
+      });
       return false;
     } finally { joining = false; if (version === revision) update({ busy: false }); }
   }

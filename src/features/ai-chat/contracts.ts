@@ -66,8 +66,10 @@ export function parseAiSafeProfile(value: unknown): AiSafeProfile {
 
 export function parseAiMember(value: unknown, roomId: string): AiMember {
   const dto = record(value);
-  const member = { ...parseAiSafeProfile(dto), aiAgentId: safeId(dto.aiAgentId),
-    chatRoomId: safeId(dto.chatRoomId), personaPrompt: text(dto.personaPrompt) };
+  const member = {
+    ...parseAiSafeProfile(dto), aiAgentId: safeId(dto.aiAgentId),
+    chatRoomId: safeId(dto.chatRoomId), personaPrompt: text(dto.personaPrompt)
+  };
   if (member.chatRoomId !== roomId) throw new ChatContractError();
   return member;
 }

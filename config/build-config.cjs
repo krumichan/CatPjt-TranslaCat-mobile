@@ -150,7 +150,7 @@ function buildAppConfig(env = process.env) {
   // EAS File 변수는 원격 Android 작업에서 실제 파일 경로가 된 뒤 검증한다.
   // 로컬에 변수가 없다는 이유로 대시보드의 원격 파일 구성을 부정하지 않는다.
   if (value(env, 'EAS_BUILD') === 'true' && value(env, 'EAS_BUILD_PLATFORM') === 'android'
-      && !isExistingFile(settings.googleServicesFile)) {
+    && !isExistingFile(settings.googleServicesFile)) {
     settings.errors.push('Android EAS build requires GOOGLE_SERVICES_JSON to point to an existing Firebase client configuration file. Configure an EAS File environment variable.');
   }
   if (settings.errors.length) throw new Error(`Invalid TranslaCat app configuration:\n- ${settings.errors.join('\n- ')}`);

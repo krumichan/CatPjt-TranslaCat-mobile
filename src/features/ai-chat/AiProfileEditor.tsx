@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
   copy: { color: colors.muted, fontSize: 14, lineHeight: 23 },
   small: { color: colors.muted, fontSize: 12, lineHeight: 20 },
   label: { color: colors.ink, fontSize: 14, lineHeight: 22, fontWeight: "600", marginTop: 10 },
-  input: { borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 13, minHeight: 48, color: colors.ink,
-    backgroundColor: colors.background, fontSize: 15, lineHeight: 23, textAlignVertical: "top" },
+  input: {
+    borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 13, minHeight: 48, color: colors.ink,
+    backgroundColor: colors.background, fontSize: 15, lineHeight: 23, textAlignVertical: "top"
+  },
   persona: { minHeight: 180 },
 });

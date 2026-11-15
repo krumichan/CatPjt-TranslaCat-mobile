@@ -8,8 +8,10 @@ import { compareIds } from "@/domain/chat/timeline";
 import { invitationKeys } from "@/features/open-invitations/queries";
 import { attentionKey, createAttentionService } from "@/notifications/attention-service";
 import { subscribeAttentionChanges, type AttentionChange } from "@/notifications/attention-changes";
-import { NotificationBadge, matchesPresentedNotificationProof, presentedNotificationProof, shouldDismissReadNotification,
-  type PresentedNotificationProof } from "@/notifications/badge";
+import {
+  NotificationBadge, matchesPresentedNotificationProof, presentedNotificationProof, shouldDismissReadNotification,
+  type PresentedNotificationProof
+} from "@/notifications/badge";
 import { parseNotification } from "@/notifications/intent";
 
 export function useNotificationAttention(registration: { sessionKey: string | null; accountBindingId: string | null }) {
@@ -26,24 +28,26 @@ export function useNotificationAttention(registration: { sessionKey: string | nu
   const readInvitations = useRef(new Set<string>());
   const revision = useRef(0);
   const freshSince = useRef(0);
-  const summary = useQuery({ queryKey: attentionKey(sessionKey), queryFn: async ({ signal }) => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let presentedBeforeSummary: PresentedNotificationProof[] = [];
-    // 알림함 열거가 멈춰도 REST 집계를 막지 않는다. 시점 증명이 없으면 전체 삭제를 생략한다.
-    try {
-      if (Platform.OS !== "web") {
-        presentedBeforeSummary = await Promise.race([
-          Notifications.getPresentedNotificationsAsync().then(items => items.flatMap(item => {
-            const proof = presentedNotificationProof(item.request.identifier, item.request.content.data);
-            return proof ? [proof] : [];
-          })).catch(() => []),
-          new Promise<PresentedNotificationProof[]>(resolve => { timer = setTimeout(() => resolve([]), 1000); }),
-        ]);
-      }
-    } finally { if (timer) clearTimeout(timer); }
-    return { ...await service.summary(signal), presentedBeforeSummary };
-  },
-    enabled: active && !!sessionKey, retry: false, staleTime: 0, refetchInterval: active ? 30000 : false });
+  const summary = useQuery({
+    queryKey: attentionKey(sessionKey), queryFn: async ({ signal }) => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      let presentedBeforeSummary: PresentedNotificationProof[] = [];
+      // 알림함 열거가 멈춰도 REST 집계를 막지 않는다. 시점 증명이 없으면 전체 삭제를 생략한다.
+      try {
+        if (Platform.OS !== "web") {
+          presentedBeforeSummary = await Promise.race([
+            Notifications.getPresentedNotificationsAsync().then(items => items.flatMap(item => {
+              const proof = presentedNotificationProof(item.request.identifier, item.request.content.data);
+              return proof ? [proof] : [];
+            })).catch(() => []),
+            new Promise<PresentedNotificationProof[]>(resolve => { timer = setTimeout(() => resolve([]), 1000); }),
+          ]);
+        }
+      } finally { if (timer) clearTimeout(timer); }
+      return { ...await service.summary(signal), presentedBeforeSummary };
+    },
+    enabled: active && !!sessionKey, retry: false, staleTime: 0, refetchInterval: active ? 30000 : false
+  });
 
   useLayoutEffect(() => {
     owner.current = { sessionKey, registration, isCurrent: auth.isCurrentSession };
@@ -82,9 +86,11 @@ export function useNotificationAttention(registration: { sessionKey: string | nu
         if (!intent || intent.accountBindingId !== binding) continue;
         const cursor = readRooms.current.get(intent.roomId);
         if ((zeroReadProof && matchesPresentedNotificationProof(notification.request.identifier, data, zeroReadProof, binding))
-          || shouldDismissReadNotification({ data, accountBindingId: binding,
-          readRoomCursor: cursor ? { roomId: intent.roomId, lastReadMessageId: cursor } : undefined,
-          readInvitationIds: Array.from(readInvitations.current) })) {
+          || shouldDismissReadNotification({
+            data, accountBindingId: binding,
+            readRoomCursor: cursor ? { roomId: intent.roomId, lastReadMessageId: cursor } : undefined,
+            readInvitationIds: Array.from(readInvitations.current)
+          })) {
           await Notifications.dismissNotificationAsync(notification.request.identifier);
         }
       }

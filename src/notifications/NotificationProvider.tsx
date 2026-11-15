@@ -44,8 +44,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [tapState, setTapState] = useState<NotificationTapState>("idle");
   const currentAuth = useRef(auth);
   useLayoutEffect(() => { currentAuth.current = auth; }, [auth]);
-  const preferences = useRef<{ sessionKey: string | null; global: { value: boolean; at: number } | null;
-    muted: Map<string, { value: boolean; at: number }> }>({
+  const preferences = useRef<{
+    sessionKey: string | null; global: { value: boolean; at: number } | null;
+    muted: Map<string, { value: boolean; at: number }>
+  }>({
     sessionKey: null, global: null, muted: new Map(),
   });
   const [responses] = useState(() => new NotificationResponses(roomId => {
@@ -150,7 +152,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     // cold start는 인증 복원과 registration 완료를 기다린 뒤 동일한 검증 경로로 처리한다.
     void Notifications.getLastNotificationResponseAsync().then(response => {
       if (response && intake.cold(response.notification.request.content.data)) Notifications.clearLastNotificationResponse();
-    }).catch(() => {});
+    }).catch(() => { });
     const rotation = Notifications.addPushTokenListener(nativeToken => { void lifecycle.sync(false, nativeToken); });
     return () => {
       intake.stop();

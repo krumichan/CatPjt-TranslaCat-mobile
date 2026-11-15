@@ -51,7 +51,7 @@ export async function catchUpMessages(
 ): Promise<string> {
   let next = cursor;
   // 복귀 중 누락된 모든 페이지를 따라간다. 실시간으로 먼저 도착한 큰 ID를 시작점으로 사용하지 않는다.
-  for (;;) {
+  for (; ;) {
     const page = await fetchAfter(next);
     const latest = latestMessageId(page.messages);
     if (page.messages.some((message) => compareIds(message.id, next) <= 0)
@@ -72,7 +72,7 @@ export async function recoverEmptyRoomHistory(
   let page = firstPage;
   let previousBoundary: string | null = null;
   // 최초 빈 응답 뒤에는 안전한 after 기준 행이 없으므로 가장 오래된 접근 가능 행까지 복원한다.
-  for (;;) {
+  for (; ;) {
     const oldest = [...page.messages].sort((a, b) => compareIds(a.id, b.id))[0]?.id ?? null;
     const boundary = previousBoundary;
     if (boundary && page.messages.some((message) => compareIds(message.id, boundary) >= 0)) {

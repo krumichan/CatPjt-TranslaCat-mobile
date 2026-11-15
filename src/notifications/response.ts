@@ -48,7 +48,7 @@ export class NotificationResponses {
   private navigateInvitation: (notificationId: string, roomId: string) => void;
 
   constructor(navigate: (roomId: string) => void, state: (state: NotificationTapState) => void, now: () => number = Date.now,
-    navigateInvitation: (notificationId: string, roomId: string) => void = () => {}) {
+    navigateInvitation: (notificationId: string, roomId: string) => void = () => { }) {
     this.navigate = navigate;
     this.state = state;
     this.now = now;

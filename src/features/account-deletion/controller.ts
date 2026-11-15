@@ -64,9 +64,11 @@ export function createDeletionController({ storage, createReceipt, readStatus, o
       await onAccepted(receipt.expectedPublicId);
     } catch (failure) {
       if (!owned(version)) return;
-      publish({ pending: null, error: null, notice: failure instanceof ApiError && failure.status === 404
-        ? "아직 접수되지 않았거나 영수증 조회 기간이 지났어요. 삭제를 시작하지 않았다면 아래 본인 확인 화면에서 이어갈 수 있어요."
-        : "처리 상태를 확인하지 못했어요. 연결을 확인하고 다시 눌러 주세요. 삭제 요청은 자동으로 보내지 않아요." });
+      publish({
+        pending: null, error: null, notice: failure instanceof ApiError && failure.status === 404
+          ? "아직 접수되지 않았거나 영수증 조회 기간이 지났어요. 삭제를 시작하지 않았다면 아래 본인 확인 화면에서 이어갈 수 있어요."
+          : "처리 상태를 확인하지 못했어요. 연결을 확인하고 다시 눌러 주세요. 삭제 요청은 자동으로 보내지 않아요."
+      });
     } finally {
       clearTimeout(timer);
       inFlight.delete(controller);
@@ -91,9 +93,11 @@ export function createDeletionController({ storage, createReceipt, readStatus, o
       await openBrowser(receipt);
       if (owned(version)) publish({ pending: null });
     } catch (failure) {
-      if (owned(version)) publish({ pending: null, error: failure instanceof ApiError && failure.code === "DELETION_ACCOUNT_MISMATCH"
-        ? "이 기기에 다른 계정의 삭제 확인 정보가 있어요. 해당 계정으로 로그인하거나 기존 요청 상태를 먼저 확인해 주세요."
-        : "본인 확인 화면을 열지 못했어요. 삭제 영수증을 보관할 수 있는지와 연결 상태를 확인해 주세요." });
+      if (owned(version)) publish({
+        pending: null, error: failure instanceof ApiError && failure.code === "DELETION_ACCOUNT_MISMATCH"
+          ? "이 기기에 다른 계정의 삭제 확인 정보가 있어요. 해당 계정으로 로그인하거나 기존 요청 상태를 먼저 확인해 주세요."
+          : "본인 확인 화면을 열지 못했어요. 삭제 영수증을 보관할 수 있는지와 연결 상태를 확인해 주세요."
+      });
       if (failure instanceof ApiError && failure.code === "DELETION_ACCOUNT_MISMATCH") return;
     }
     if (owned(version) && state.receipt) await check();
@@ -116,7 +120,8 @@ export function createDeletionController({ storage, createReceipt, readStatus, o
     }
   };
 
-  return { restore, begin, check, forget, snapshot: () => state,
+  return {
+    restore, begin, check, forget, snapshot: () => state,
     attach() { disposed = false; },
     dispose() { disposed = true; ++revision; inFlight.forEach(controller => controller.abort()); inFlight.clear(); },
   };

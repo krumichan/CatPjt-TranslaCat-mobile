@@ -32,7 +32,8 @@ export function useOpenProfile(roomId: string) {
     focused.current = true;
     if (!valid || status !== "signedIn" || !sessionKey) return () => { focused.current = false; };
     const isCurrent = () => current.current === owner && focused.current && isCurrentSession(sessionKey);
-    const owned = createOpenProfileController({ roomId, service, isCurrent, isActive, pickImage: pickProfileImage,
+    const owned = createOpenProfileController({
+      roomId, service, isCurrent, isActive, pickImage: pickProfileImage,
       onChange: state => { if (isCurrent()) setValue({ owner, state }); },
       onSaved: () => {
         if (!isCurrent()) return;

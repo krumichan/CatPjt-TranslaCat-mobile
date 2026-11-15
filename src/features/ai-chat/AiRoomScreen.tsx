@@ -70,8 +70,10 @@ function AiRoomContent({ roomId, valid, authStatus, ai }: {
     if (disabled || !isActive() || controller.current?.getState().revision !== state.revision) return;
 
     setEditor({ member, revision: state.revision });
-    setForm(member ? { nickname: member.nickname, bio: member.bio ?? "", originalLanguageCode: member.originalLanguageCode,
-      personaPrompt: member.personaPrompt } : freshForm());
+    setForm(member ? {
+      nickname: member.nickname, bio: member.bio ?? "", originalLanguageCode: member.originalLanguageCode,
+      personaPrompt: member.personaPrompt
+    } : freshForm());
     setDeleteTarget(null);
   };
   const save = async () => {

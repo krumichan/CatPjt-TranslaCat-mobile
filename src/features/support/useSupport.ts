@@ -29,7 +29,8 @@ export function useSupport() {
     const uncertain = pendingBySession.get(sessionKey) ?? null;
     // 각 컨트롤러의 0부터 시작하는 번호를 이 작업 화면의 이전 성공 번호에 연결한다.
     const offset = revisions.current;
-    const owned = createSupportController({ service, isCurrent, initialUncertain: uncertain,
+    const owned = createSupportController({
+      service, isCurrent, initialUncertain: uncertain,
       onChange: state => {
         if (!isCurrent()) return;
         const mapped = withSupportRevisionOffset(state, offset);

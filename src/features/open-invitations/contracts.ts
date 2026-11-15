@@ -35,10 +35,12 @@ export function parseOpenInvitation(value: unknown): OpenInvitation {
   const readAt = dto.readAt == null ? null : timestamp(dto.readAt);
   if (isRead !== (readAt !== null)) throw new ChatContractError();
   // 외부 URL·이메일·계정 ID를 복사하지 않고 방별 초대 신원과 검증한 방 ID만 사용한다.
-  return { id: safeId(dto.id), roomId: safeId(dto.roomId),
+  return {
+    id: safeId(dto.id), roomId: safeId(dto.roomId),
     roomName: payload.roomName == null ? null : text(payload.roomName),
     inviterNickname: text(payload.inviterOpenNickname), inviterMemberCode: text(payload.inviterMemberCode),
-    isRead, readAt, createdAt: timestamp(dto.createdAt) };
+    isRead, readAt, createdAt: timestamp(dto.createdAt)
+  };
 }
 
 export function parseInvitationPage(value: unknown, cursor: string | null) {

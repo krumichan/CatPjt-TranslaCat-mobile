@@ -1,8 +1,10 @@
 import type { createApiClient } from "../../api/client.ts";
 import { ChatContractError, count, record, wireId } from "../../domain/chat/contracts.ts";
 import { createChatService } from "../chat/service.ts";
-import { parseAiMember, parseAiSafeProfile, parseAiSettings, validateAiProfile, validateAiSettings,
-  type AiProfileInput, type AiSettingsPatch } from "./contracts.ts";
+import {
+  parseAiMember, parseAiSafeProfile, parseAiSettings, validateAiProfile, validateAiSettings,
+  type AiProfileInput, type AiSettingsPatch
+} from "./contracts.ts";
 
 export function createAiService(api: ReturnType<typeof createApiClient>) {
   const chat = createChatService(api);

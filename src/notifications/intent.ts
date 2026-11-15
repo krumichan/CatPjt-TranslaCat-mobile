@@ -50,8 +50,10 @@ export function parseNotification(data: unknown): NotificationIntent | null {
     || typeof value.eventId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(value.eventId)
     || typeof value.accountBindingId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(value.accountBindingId)) return null;
   // 초대에는 가짜 메시지 ID나 payload URL을 쓰지 않는다. 실제 수신권한은 REST에서 다시 확인한다.
-  return { schemaVersion: 2, kind: "OPEN_INVITATION", eventId: value.eventId, notificationId: value.notificationId,
-    roomId: value.roomId, accountBindingId: value.accountBindingId };
+  return {
+    schemaVersion: 2, kind: "OPEN_INVITATION", eventId: value.eventId, notificationId: value.notificationId,
+    roomId: value.roomId, accountBindingId: value.accountBindingId
+  };
 }
 
 export function authorizeNotificationIntent(

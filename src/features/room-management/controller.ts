@@ -77,9 +77,11 @@ function authorityKey(authority: RoomAuthority) {
 }
 
 export function emptyRoomManagement(): RoomManagementState {
-  return { room: null, members: [], myMemberId: null, friends: [], friendsError: null,
+  return {
+    room: null, members: [], myMemberId: null, friends: [], friendsError: null,
     bans: [], hasMoreBans: false, loadingBans: false, bansError: null,
-    loading: true, busy: false, ready: false, uncertain: false, revision: 0, error: null, notice: null, exited: false };
+    loading: true, busy: false, ready: false, uncertain: false, revision: 0, error: null, notice: null, exited: false
+  };
 }
 
 function errorMessage(error: unknown) {
@@ -97,8 +99,8 @@ function errorMessage(error: unknown) {
 // 화면 이탈 뒤에도 같은 로그인·방의 불확실한 변경을 자동으로 재전송하지 않는다.
 const uncertainScopes = new Set<string>();
 const openInvitationAttempts = new Map<string, { targetPublicId: string; requestId: string }>();
-class StaleRead extends Error {}
-class ExitedRoom extends Error {}
+class StaleRead extends Error { }
+class ExitedRoom extends Error { }
 // bans의 400도 강등·강퇴 경합일 수 있으므로 퇴장 대신 방 권한을 다시 확인한다.
 const bansAccessChanged = (error: unknown) => error instanceof ApiError && [400, 403, 404].includes(error.status);
 // room GET의 400은 서버가 멤버십 부재를 반환하는 공개 계약이다. 쓰기·차단 목록 400에는 적용하지 않는다.
@@ -158,9 +160,11 @@ export function createRoomManagementController(service: RoomManagementService, r
     if (!current() || state.exited) return;
     // 종료 상태를 먼저 공개하여 구독 해제 중 발생할 수 있는 콜백도 무시한다.
     nextBanCursor = null;
-    update({ room: null, members: [], myMemberId: null, friends: [], friendsError: null,
+    update({
+      room: null, members: [], myMemberId: null, friends: [], friendsError: null,
       bans: [], hasMoreBans: false, loadingBans: false, bansError: null, loading: false,
-      ready: false, exited: true, revision: state.revision + 1, error: null, notice });
+      ready: false, exited: true, revision: state.revision + 1, error: null, notice
+    });
     stopWatching();
   }
 
@@ -208,8 +212,10 @@ export function createRoomManagementController(service: RoomManagementService, r
     cancelPoll = null;
     nextBanCursor = null;
     refreshQueued = true;
-    update({ revision: state.revision + 1, ready: false, room: null, members: [], myMemberId: null,
-      friends: [], friendsError: null, bans: [], hasMoreBans: false, bansError: null, error: null });
+    update({
+      revision: state.revision + 1, ready: false, room: null, members: [], myMemberId: null,
+      friends: [], friendsError: null, bans: [], hasMoreBans: false, bansError: null, error: null
+    });
     queueRefresh();
   }
 
@@ -301,8 +307,10 @@ export function createRoomManagementController(service: RoomManagementService, r
         if (!preserveExisting) nextBanCursor = null;
         // 정상 안전망 조회는 작성 중인 확인창과 목록을 유지하고 완료 전까지 변경 버튼만 잠근다.
         if (preserveExisting) update({ loading: true, error: null });
-        else update({ loading: true, ready: false, room: null, error: null, members: [], myMemberId: null,
-          friends: [], friendsError: null, bans: [], hasMoreBans: false, bansError: null });
+        else update({
+          loading: true, ready: false, room: null, error: null, members: [], myMemberId: null,
+          friends: [], friendsError: null, bans: [], hasMoreBans: false, bansError: null
+        });
         try {
           let authority = await readAuthority(revision);
           // 변함없는 안전망 GET은 사용자가 펼친 차단 페이지·초대 선택·cursor를 보존한다.
@@ -343,8 +351,10 @@ export function createRoomManagementController(service: RoomManagementService, r
           lastBansKey = nextBansKey;
           lastAuthorityRevision = publishedRevision;
           nextBanCursor = cursor;
-          update({ ...authority, revision: publishedRevision, friends, friendsError, bans, bansError, hasMoreBans, ready: true,
-            notice: authority.room.closed ? "방이 종료됐어요. 대화 기록은 계속 읽을 수 있어요." : state.notice });
+          update({
+            ...authority, revision: publishedRevision, friends, friendsError, bans, bansError, hasMoreBans, ready: true,
+            notice: authority.room.closed ? "방이 종료됐어요. 대화 기록은 계속 읽을 수 있어요." : state.notice
+          });
           succeeded = true;
           readFailures = 0;
           watch(authority.room);
@@ -354,8 +364,10 @@ export function createRoomManagementController(service: RoomManagementService, r
           if (error instanceof StaleRead || revision !== state.revision) continue;
           succeeded = false;
           readFailures++;
-          update({ revision: state.revision + (state.ready ? 1 : 0), room: null, members: [], myMemberId: null,
-            friends: [], bans: [], hasMoreBans: false, ready: false, error: errorMessage(error) });
+          update({
+            revision: state.revision + (state.ready ? 1 : 0), room: null, members: [], myMemberId: null,
+            friends: [], bans: [], hasMoreBans: false, ready: false, error: errorMessage(error)
+          });
         }
       } while (current() && !state.exited && refreshQueued);
     } finally {

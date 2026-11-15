@@ -74,12 +74,14 @@ export default function RoomManagementScreen({ roomId }: { roomId: string }) {
     if (!owner || disabled || !isActive()) return;
     const revision = owner.getState().revision;
     setReason("");
-    setConfirmation({ ...value, onConfirm: () => {
-      setConfirmation(null);
-      if (!isActive() || controller.current !== owner || owner.getState().revision !== revision
-        || !owner.getState().ready) return;
-      work();
-    } });
+    setConfirmation({
+      ...value, onConfirm: () => {
+        setConfirmation(null);
+        if (!isActive() || controller.current !== owner || owner.getState().revision !== revision
+          || !owner.getState().ready) return;
+        work();
+      }
+    });
   };
 
   const invite = async () => {

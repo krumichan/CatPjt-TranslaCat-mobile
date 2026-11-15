@@ -34,7 +34,7 @@ export function createUserBlockController({ service, selfId, isCurrent, onChange
   const request = async <T>(action: (signal: AbortSignal) => Promise<T>): Promise<T> => {
     const owned = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let abort: () => void = () => {};
+    let abort: () => void = () => { };
     const interrupted = new Promise<never>((_resolve, reject) => {
       abort = () => { owned.abort(); reject(new Error("BLOCK_REQUEST_INTERRUPTED")); };
       if (cancellation.signal.aborted) abort();
@@ -113,10 +113,12 @@ export function createUserBlockController({ service, selfId, isCurrent, onChange
         if (!current()) return;
         const blocked = blocks.some(block => block.user.userId === target.userId);
         const matches = kind === "block" ? blocked : !blocked;
-        update({ blocks, loaded: true, needsRefresh: false,
+        update({
+          blocks, loaded: true, needsRefresh: false,
           notice: matches ? (writeFailed ? "현재 차단 목록에서 처리 결과를 확인했어요."
             : kind === "block" ? "사용자를 차단했어요. 기존 친구 관계도 해제돼요." : "차단을 해제했어요. 친구 관계는 자동으로 복원되지 않아요.") : null,
-          error: matches ? null : "요청한 상태를 확인하지 못했어요. 현재 목록을 확인하고 다시 선택해 주세요." });
+          error: matches ? null : "요청한 상태를 확인하지 못했어요. 현재 목록을 확인하고 다시 선택해 주세요."
+        });
       } catch {
         update({ error: "처리 결과를 확인하지 못했어요. 자동으로 다시 보내지 않아요. 차단 목록을 새로고침해 주세요." });
       } finally { update({ pending: null }); }

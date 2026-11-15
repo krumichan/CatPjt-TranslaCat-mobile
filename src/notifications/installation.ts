@@ -39,7 +39,7 @@ export class InstallationIdentity {
       this.value = next;
       return { ...next };
     });
-    this.queue = operation.then(() => {}, () => {});
+    this.queue = operation.then(() => { }, () => { });
     return operation;
   }
 }

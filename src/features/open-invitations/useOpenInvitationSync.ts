@@ -32,13 +32,15 @@ export function useOpenInvitationSync() {
     const connect = () => {
       if (!current() || stop) return;
       refresh();
-      stop = connectInvitationFeed({ apiBaseUrl: runtime.apiBaseUrl!, isCurrent: current, refresh,
+      stop = connectInvitationFeed({
+        apiBaseUrl: runtime.apiBaseUrl!, isCurrent: current, refresh,
         onRead: readRoom => { if (current()) publishAttentionChange({ sessionKey, readRoom }); },
         accessToken: async () => {
           if (!current()) return null;
           const token = await accessToken();
           return current() ? token : null;
-        } });
+        }
+      });
     };
     connect();
     const subscription = AppState.addEventListener("change", state => {

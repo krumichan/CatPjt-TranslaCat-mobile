@@ -30,7 +30,7 @@ export class PushLifecycle {
 
   private enqueue(operation: () => Promise<void>) {
     const next = this.queue.then(operation);
-    this.queue = next.catch(() => {});
+    this.queue = next.catch(() => { });
     return next;
   }
 

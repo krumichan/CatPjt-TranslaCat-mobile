@@ -23,7 +23,7 @@ export interface RoomBan {
   releasable: boolean;
 }
 export interface InviteTargets { userIds: string[]; publicIds: string[] }
-export class ManagementInputError extends Error {}
+export class ManagementInputError extends Error { }
 
 function role(value: unknown): MemberRole {
   if (value !== "OWNER" && value !== "ADMIN" && value !== "MEMBER") throw new ChatContractError();
@@ -33,9 +33,11 @@ function role(value: unknown): MemberRole {
 export function parseOpenMember(value: unknown): RoomMember {
   const dto = record(value);
   // 방 전용 신원만 사용한다. 서버가 실수로 추가한 계정 ID/이메일은 복사하지 않는다.
-  return { id: safeId(dto.openChatMemberId), displayName: text(dto.nickname), publicId: null,
+  return {
+    id: safeId(dto.openChatMemberId), displayName: text(dto.nickname), publicId: null,
     memberCode: text(dto.memberCode), role: role(dto.role), active: flag(dto.active),
-    ...(dto.profileImageUrl !== undefined ? { profileImageUrl: profileImageUrl(dto.profileImageUrl) } : {}) };
+    ...(dto.profileImageUrl !== undefined ? { profileImageUrl: profileImageUrl(dto.profileImageUrl) } : {})
+  };
 }
 
 export function parseMembers(value: unknown, roomId: string, open: boolean): RoomMember[] {
@@ -77,8 +79,10 @@ export function parseBanPage(value: unknown, cursor: string | null) {
     const id = safeId(item.banId);
     if (previous && wireId(id) >= wireId(previous)) throw new ChatContractError();
     previous = id;
-    return { id, memberId: safeId(item.targetOpenChatMemberId), displayName: text(item.nickname),
-      memberCode: text(item.memberCode), reason: text(item.reason), releasable: flag(item.releasable) };
+    return {
+      id, memberId: safeId(item.targetOpenChatMemberId), displayName: text(item.nickname),
+      memberCode: text(item.memberCode), reason: text(item.reason), releasable: flag(item.releasable)
+    };
   });
   const hasNext = flag(dto.hasNext);
   const nextCursor = optionalId(dto.nextCursorId);

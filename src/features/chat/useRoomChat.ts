@@ -15,20 +15,22 @@ export function useRoomChat(roomId: string | null) {
   const { api, sessionKey, isCurrentSession, accessToken } = auth;
   const service = useMemo(() => {
     const chat = createChatService(api);
-    return { ...chat, read: async (...args: Parameters<typeof chat.read>) => {
-      const result = await chat.read(...args);
-      if (sessionKey && isActive() && isCurrentSession(sessionKey) && result.lastReadMessageId) {
-        publishAttentionChange({ sessionKey, readRoom: { roomId: args[0], lastReadMessageId: result.lastReadMessageId } });
+    return {
+      ...chat, read: async (...args: Parameters<typeof chat.read>) => {
+        const result = await chat.read(...args);
+        if (sessionKey && isActive() && isCurrentSession(sessionKey) && result.lastReadMessageId) {
+          publishAttentionChange({ sessionKey, readRoom: { roomId: args[0], lastReadMessageId: result.lastReadMessageId } });
+        }
+        return result;
       }
-      return result;
-    } };
+    };
   }, [api, isActive, isCurrentSession, sessionKey]);
   const controller = useMemo(() => createRoomChatController({
     key: `${sessionKey ?? "signed-out"}:${roomId ?? "invalid"}`,
     roomId: roomId ?? "", service, isActive,
     isCurrent: () => isCurrentSession(sessionKey),
     connect: handlers => {
-      if (!runtime.apiBaseUrl || !roomId) return () => {};
+      if (!runtime.apiBaseUrl || !roomId) return () => { };
       return connectRoom({
         ...handlers, apiBaseUrl: runtime.apiBaseUrl, roomId,
         accessToken: async () => {

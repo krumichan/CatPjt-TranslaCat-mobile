@@ -14,7 +14,7 @@ export async function restoreUnreadHistory(
   let boundary: string | null = null;
 
   // 화면에 중간 페이지를 노출하지 않고 첫 미읽음 행이 있는 연속된 기록을 준비한다.
-  for (;;) {
+  for (; ;) {
     let previous: string | null = null;
     for (const message of page.messages) {
       wireId(message.id);
@@ -59,7 +59,7 @@ export async function refreshMessageWindow(
   let messages: ChatMessage[] = [];
 
   // 재조회는 정확한 앵커 존재를 요구하지 않는다. 삭제된 가시 행도 범위 비교로 확인할 수 있게 한다.
-  for (;;) {
+  for (; ;) {
     let previous: string | null = null;
     for (const message of page.messages) {
       wireId(message.id);

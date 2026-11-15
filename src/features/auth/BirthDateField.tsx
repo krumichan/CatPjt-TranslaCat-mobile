@@ -130,7 +130,7 @@ export function BirthDateField({ value, onChange, disabled = false, error }: {
                     accessibilityState={{ disabled: cell.disabled, selected: picker.hasSelection && picker.date.day === cell.day }}
                     disabled={cell.disabled} onPress={() => setPicker({ ...picker, date: { ...picker.date, day: cell.day }, hasSelection: true })}
                     style={[styles.option, { minHeight: Math.max(44, Math.ceil(24 * fontScale + 12)) },
-                      picker.hasSelection && picker.date.day === cell.day && styles.selected, cell.disabled && styles.disabled]}>
+                    picker.hasSelection && picker.date.day === cell.day && styles.selected, cell.disabled && styles.disabled]}>
                     <Text style={[styles.optionText, picker.hasSelection && picker.date.day === cell.day && styles.selectedText]}>{cell.day}</Text>
                   </Pressable>}
                 </View>)}
@@ -151,8 +151,10 @@ export function BirthDateField({ value, onChange, disabled = false, error }: {
 const styles = StyleSheet.create({
   field: { gap: 8 },
   label: { color: colors.ink, fontSize: 14, lineHeight: 22, fontWeight: "700" },
-  input: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.blueLine,
-    borderRadius: 12, minHeight: 54, backgroundColor: colors.surface, paddingHorizontal: 14, paddingVertical: 14 },
+  input: {
+    flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: colors.blueLine,
+    borderRadius: 12, minHeight: 54, backgroundColor: colors.surface, paddingHorizontal: 14, paddingVertical: 14
+  },
   inputLabel: { color: colors.ink, fontSize: 16, lineHeight: 24, flex: 1 },
   placeholder: { color: colors.muted },
   calendarMark: { color: colors.blueDark, fontSize: 24, lineHeight: 28 },

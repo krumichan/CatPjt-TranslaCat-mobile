@@ -101,8 +101,10 @@ function inputText(value: unknown, limit: number): string {
 
 export function validateSupportCreateInput(input: SupportCreateInput): SupportCreateInput {
   if (!input || !SUPPORT_CATEGORIES.includes(input.category)) return invalidInput();
-  return { title: inputText(input.title, SUPPORT_TITLE_MAX_LENGTH),
-    content: inputText(input.content, SUPPORT_CONTENT_MAX_LENGTH), category: input.category };
+  return {
+    title: inputText(input.title, SUPPORT_TITLE_MAX_LENGTH),
+    content: inputText(input.content, SUPPORT_CONTENT_MAX_LENGTH), category: input.category
+  };
 }
 
 export function validateSupportReplyInput(input: SupportReplyInput): SupportReplyInput {
@@ -112,9 +114,11 @@ export function validateSupportReplyInput(input: SupportReplyInput): SupportRepl
 
 function parseReply(value: unknown): SupportReply {
   const dto = object(value);
-  return { id: responseId(dto.id), parentId: dto.parentId === null ? null : responseId(dto.parentId),
+  return {
+    id: responseId(dto.id), parentId: dto.parentId === null ? null : responseId(dto.parentId),
     content: responseText(dto.content, SUPPORT_CONTENT_MAX_LENGTH), authorRole: member(dto.authorRole, SUPPORT_AUTHOR_ROLES),
-    authorName: responseText(dto.authorName), createdAt: timestamp(dto.createdAt) };
+    authorName: responseText(dto.authorName), createdAt: timestamp(dto.createdAt)
+  };
 }
 
 function parseInquiry(value: unknown, selfId: string, complete: boolean): SupportInquiry {
@@ -137,10 +141,12 @@ function parseInquiry(value: unknown, selfId: string, complete: boolean): Suppor
     previousId = Number(reply.id);
   }
 
-  return { id: responseId(dto.id), ownerId, title: responseText(dto.title, SUPPORT_TITLE_MAX_LENGTH),
+  return {
+    id: responseId(dto.id), ownerId, title: responseText(dto.title, SUPPORT_TITLE_MAX_LENGTH),
     content: responseText(dto.content, SUPPORT_CONTENT_MAX_LENGTH), category: member(dto.category, SUPPORT_CATEGORIES),
     status: member(dto.status, SUPPORT_STATUSES), replyCount, createdAt: timestamp(dto.createdAt), updatedAt: timestamp(dto.updatedAt),
-    replies, unread: dto.unread };
+    replies, unread: dto.unread
+  };
 }
 
 export function createSupportService(api: ReturnType<typeof createApiClient>, selfId: string) {

@@ -56,7 +56,7 @@ export class AuthSession {
   private onReleaseSession: (accessToken: string, sessionKey: string) => Promise<void>;
 
   constructor(storage: SessionStorage, transport: SessionTransport, now: () => number = Date.now,
-    onBoundary: () => void = () => {}, onReleaseSession: (accessToken: string, sessionKey: string) => Promise<void> = async () => {}) {
+    onBoundary: () => void = () => { }, onReleaseSession: (accessToken: string, sessionKey: string) => Promise<void> = async () => { }) {
     this.storage = storage;
     this.transport = transport;
     this.now = now;
@@ -86,7 +86,7 @@ export class AuthSession {
 
   private store(operation: () => Promise<void>): Promise<void> {
     const next = this.storageQueue.then(operation);
-    this.storageQueue = next.catch(() => {});
+    this.storageQueue = next.catch(() => { });
     return next;
   }
 
@@ -121,7 +121,7 @@ export class AuthSession {
     this.pendingCleanups.add(captured);
     let release: Promise<void> = Promise.resolve();
     if (sessionKey) {
-      try { release = this.onReleaseSession(captured.credentials.accessToken, sessionKey).catch(() => {}); }
+      try { release = this.onReleaseSession(captured.credentials.accessToken, sessionKey).catch(() => { }); }
       catch { /* 부가 정리가 실패해도 sid 폐기는 독립적으로 진행한다. */ }
     }
     const refreshCaptured = async () => {
@@ -234,7 +234,7 @@ export class AuthSession {
       await this.accept(pair, generation, email);
     } catch (error) {
       // 저장 실패 때 불완전한 새 세션을 남기지 않으며, 새 계정이 있으면 건드리지 않는다.
-      void this.transport.logout(pair.accessToken).catch(() => {});
+      void this.transport.logout(pair.accessToken).catch(() => { });
       if (this.generation === generation) {
         try { await this.store(() => this.storage.remove()); } catch { /* 화면에서 재시도를 안내한다. */ }
         if (this.generation === generation) this.invalidate();

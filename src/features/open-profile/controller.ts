@@ -69,8 +69,10 @@ export function createOpenProfileController({ roomId, service, pickImage, isCurr
     stopTimer = schedule(() => {
       if (!current() || id !== sequence) return;
       const uncertain = cancelRequest();
-      emit({ pending: null, ready: false, ...(uncertain ? { uncertain: { reviewed: false } } : {}),
-        error: uncertain ? "사진 변경 결과를 확인하지 못했어요. 같은 요청을 다시 보내기 전에 현재 사진을 확인해 주세요." : "응답이 늦어요. 연결 상태를 확인하고 다시 불러와 주세요." });
+      emit({
+        pending: null, ready: false, ...(uncertain ? { uncertain: { reviewed: false } } : {}),
+        error: uncertain ? "사진 변경 결과를 확인하지 못했어요. 같은 요청을 다시 보내기 전에 현재 사진을 확인해 주세요." : "응답이 늦어요. 연결 상태를 확인하고 다시 불러와 주세요."
+      });
     }, 20000);
     return { id, signal: abort.signal };
   };
@@ -134,10 +136,12 @@ export function createOpenProfileController({ roomId, service, pickImage, isCurr
       const rejected = typeof status === "number" && status >= 400 && status < 500;
       const uncertain = writeStarted && !rejected;
       const unavailable = status === 401 || status === 403 || status === 404 || (!writeStarted && error instanceof ChatContractError);
-      emit({ ready: !uncertain && !unavailable, ...(unavailable ? { profile: null, draft: null } : {}),
+      emit({
+        ready: !uncertain && !unavailable, ...(unavailable ? { profile: null, draft: null } : {}),
         ...(uncertain ? { uncertain: { reviewed: false } } : {}), error: uncertain
-        ? "사진 변경 결과를 확인하지 못했어요. 현재 사진을 다시 확인해 주세요. 자동으로 다시 전송하지 않아요."
-        : errorMessage(error) });
+          ? "사진 변경 결과를 확인하지 못했어요. 현재 사진을 다시 확인해 주세요. 자동으로 다시 전송하지 않아요."
+          : errorMessage(error)
+      });
     } finally {
       if (current() && operation.id === sequence) { end(); emit({ pending: null }); }
     }

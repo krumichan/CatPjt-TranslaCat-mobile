@@ -54,11 +54,13 @@ export default function OpenProfileScreen({ roomId }: { roomId: string }) {
         </>}
         {state.profile.profileImageUrl && <Button label="프로필 사진 삭제" secondary disabled={disabled} onPress={() => {
           const expected = state.profile!;
-          setConfirmation({ title: "프로필 사진을 삭제할까요?", description: "이 방의 사진을 지우고 기본 아이콘으로 표시해요. 일반 계정 사진과 다른 방의 사진은 바뀌지 않아요.",
+          setConfirmation({
+            title: "프로필 사진을 삭제할까요?", description: "이 방의 사진을 지우고 기본 아이콘으로 표시해요. 일반 계정 사진과 다른 방의 사진은 바뀌지 않아요.",
             confirmLabel: "사진 삭제", danger: true, onConfirm: () => {
               setConfirmation(null);
               profile.remove(expected.openChatMemberId, expected.profileImageUrl ?? null);
-            } });
+            }
+          });
         }} />}
       </View>}
       {state.uncertain && <View style={styles.card}>
@@ -69,7 +71,7 @@ export default function OpenProfileScreen({ roomId }: { roomId: string }) {
       </View>}
       {!state.uncertain && <Button label="프로필 새로고침" secondary disabled={!profile.available || busy} onPress={profile.reload} />}
     </View>}
-    <ConfirmationDialog confirmation={profile.available && !disabled ? confirmation : null} reason="" onReasonChange={() => {}}
+    <ConfirmationDialog confirmation={profile.available && !disabled ? confirmation : null} reason="" onReasonChange={() => { }}
       onCancel={() => setConfirmation(null)} disabled={disabled} />
   </Screen>;
 }

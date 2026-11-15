@@ -4,7 +4,7 @@ import * as Notifications from "expo-notifications";
 import { AndroidImportance } from "expo-notifications";
 import { Platform } from "react-native";
 
-export class DevelopmentSetupError extends Error {}
+export class DevelopmentSetupError extends Error { }
 
 export async function acquireDevelopmentPushToken(projectId: string | null): Promise<string> {
   // 원격 푸시는 실제 native 개발 빌드에서만 확인한다.

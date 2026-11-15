@@ -19,8 +19,10 @@ export function connectInvitationFeed(input: {
   isCurrent(): boolean;
   refresh(): void;
   onRead?(cursor: { roomId: string; lastReadMessageId: string }): void;
-}, dependencies: { createClient?: (config: StompConfig) => Client;
-  schedule?: (callback: () => void, delay: number) => () => void } = {}) {
+}, dependencies: {
+  createClient?: (config: StompConfig) => Client;
+  schedule?: (callback: () => void, delay: number) => () => void
+} = {}) {
   let disposed = false;
   let terminal = false;
   let failures = 0;
@@ -36,7 +38,7 @@ export function connectInvitationFeed(input: {
   };
   const configuration: StompConfig = {
     brokerURL: chatSocketUrl(input.apiBaseUrl), reconnectDelay: 3000, connectionTimeout: 10000,
-    heartbeatIncoming: 0, heartbeatOutgoing: 10000, debug: () => {},
+    heartbeatIncoming: 0, heartbeatOutgoing: 10000, debug: () => { },
     beforeConnect: async () => {
       if (!current()) { stop(); return; }
       try {
@@ -53,7 +55,7 @@ export function connectInvitationFeed(input: {
         client.connectHeaders = {};
         // 갱신 일시 실패는 비인증 연결을 보내지 않고 backoff 뒤 현재 계정 자격을 다시 확인한다.
         const delay = Math.min(3000 * 2 ** Math.min(failures++, 4), 30000);
-        void client.deactivate().catch(() => {}).then(() => {
+        void client.deactivate().catch(() => { }).then(() => {
           if (!current()) return;
           cancelRetry?.();
           cancelRetry = later(() => { cancelRetry = null; if (current()) client.activate(); }, delay);

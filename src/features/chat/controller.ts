@@ -57,7 +57,7 @@ const denied = (error: unknown) => [400, 401, 403, 404].includes(statusOf(error)
 const retryable = (error: unknown) => !(error instanceof ChatContractError)
   && (statusOf(error) === null || statusOf(error) === 0 || statusOf(error) === 408 || statusOf(error) === 429 || (statusOf(error) ?? 0) >= 500);
 const backoff = (failures: number) => Math.min(1000 * 2 ** Math.min(failures, 5), 30000);
-class InactiveRequest extends Error {}
+class InactiveRequest extends Error { }
 
 export function createRoomChatController({ key, roomId, service, isCurrent, isActive, connect, schedule = scheduleTimer }: {
   key: string;
@@ -103,8 +103,8 @@ export function createRoomChatController({ key, roomId, service, isCurrent, isAc
   const request = async <T,>(c: Cycle, work: (signal: AbortSignal) => Promise<T>): Promise<T> => {
     if (!live(c)) throw new InactiveRequest();
     const cancellation = new AbortController();
-    let cancelTimeout = () => {};
-    let onAbort = () => {};
+    let cancelTimeout = () => { };
+    let onAbort = () => { };
     // 토큰 대기·fetch·응답 읽기 전체를 제한한다. 종료된 요청의 늦은 응답은 사용하지 않는다.
     const deadline = new Promise<never>((_, reject) => {
       onAbort = () => { reject(new InactiveRequest()); cancellation.abort(); };
@@ -205,8 +205,10 @@ export function createRoomChatController({ key, roomId, service, isCurrent, isAc
     const window = await checked(c, refreshMessageWindow(start, first, next ?? null, id => before(c, id)));
     const retained = new Set(window.map(message => message.id));
     // 조회한 가시 범위에서 사라진 행만 제거한다. 다른 기록과 새 실시간 메시지는 보존한다.
-    update(c, { messages: state.messages.filter(message => compareIds(message.id, first) < 0
-      || compareIds(message.id, last) > 0 || retained.has(message.id)) });
+    update(c, {
+      messages: state.messages.filter(message => compareIds(message.id, first) < 0
+        || compareIds(message.id, last) > 0 || retained.has(message.id))
+    });
     applySnapshot(c, window, capturedRevision);
   };
 
@@ -348,15 +350,19 @@ export function createRoomChatController({ key, roomId, service, isCurrent, isAc
     old?.stopSocket?.();
     old?.timers.forEach(cancelTimer => cancelTimer());
     old?.timers.clear();
-    publish({ syncing: false, loadingMore: false, sending: false, connection: "DISCONNECTED", authorityReady: false, ...(state.sending ? {
-      uncertain: true, notice: "화면을 떠나는 동안 전송 결과를 확인하지 못했어요. 대화를 확인한 뒤 다시 작성해 주세요.",
-    } : {}) });
+    publish({
+      syncing: false, loadingMore: false, sending: false, connection: "DISCONNECTED", authorityReady: false, ...(state.sending ? {
+        uncertain: true, notice: "화면을 떠나는 동안 전송 결과를 확인하지 못했어요. 대화를 확인한 뒤 다시 작성해 주세요.",
+      } : {})
+    });
   };
   const start = () => {
     if (!roomId || !isCurrent() || !isActive() || (cycle && live(cycle))) return;
     if (cycle) stop();
-    const c: Cycle = { abort: new AbortController(), timers: new Map(), stopSocket: null, syncing: false, syncAgain: false,
-      reading: false, terminal: false, syncFailures: 0, readFailures: 0 };
+    const c: Cycle = {
+      abort: new AbortController(), timers: new Map(), stopSocket: null, syncing: false, syncAgain: false,
+      reading: false, terminal: false, syncFailures: 0, readFailures: 0
+    };
     cycle = c;
     revision++;
     freshIds.clear();
@@ -414,8 +420,10 @@ export function createRoomChatController({ key, roomId, service, isCurrent, isAc
         if (!live(c)) return false;
         const status = statusOf(error);
         const rejected = status !== null && status >= 400 && status < 500 && status !== 408;
-        update(c, { uncertain: !rejected, notice: rejected ? chatErrorMessage(error)
-          : "전송 결과를 확인하지 못했어요. 이미 저장됐을 수 있으니 대화를 새로고침해 확인해 주세요. 자동으로 다시 보내지 않아요." });
+        update(c, {
+          uncertain: !rejected, notice: rejected ? chatErrorMessage(error)
+            : "전송 결과를 확인하지 못했어요. 이미 저장됐을 수 있으니 대화를 새로고침해 확인해 주세요. 자동으로 다시 보내지 않아요."
+        });
         return false;
       } finally { update(c, { sending: false }); }
     },

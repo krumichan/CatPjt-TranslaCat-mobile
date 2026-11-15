@@ -24,9 +24,11 @@ export default function RoomListScreen() {
   const active = useFocusedActive();
   const service = useMemo(() => createChatService(auth.api), [auth.api]);
   const invitations = useMemo(() => createOpenInvitationService(auth.api), [auth.api]);
-  const invitationSummary = useQuery({ queryKey: invitationKeys.summary(auth.sessionKey),
+  const invitationSummary = useQuery({
+    queryKey: invitationKeys.summary(auth.sessionKey),
     queryFn: ({ signal }) => invitations.summary(signal), enabled: active && auth.status === "signedIn" && !!auth.sessionKey,
-    staleTime: 0, retry: false, refetchInterval: active ? 30000 : false });
+    staleTime: 0, retry: false, refetchInterval: active ? 30000 : false
+  });
   const query = useQuery({
     queryKey: ["chat-rooms", auth.sessionKey],
     queryFn: async ({ signal }) => (await service.rooms(signal)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),

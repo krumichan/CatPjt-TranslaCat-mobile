@@ -153,9 +153,11 @@ function FriendWorkspace({ sessionKey }: { sessionKey: string }) {
         {found && <View style={styles.result}>
           <Text style={styles.name}>{found.nickname}</Text>
           <Text style={styles.helper}>@{found.publicId} · {statusLabels[found.friendStatus]}</Text>
-          {found.friendStatus === "NONE" && <Button label="친구 요청 보내기" disabled={busy || uncertain} onPress={() => { void run(signal => service.request(found.publicId, signal), () => {
-            setFound({ ...found, friendStatus: "REQUEST_SENT" }); setNotice("친구 요청을 보냈어요."); void refresh();
-          }); }} />}
+          {found.friendStatus === "NONE" && <Button label="친구 요청 보내기" disabled={busy || uncertain} onPress={() => {
+            void run(signal => service.request(found.publicId, signal), () => {
+              setFound({ ...found, friendStatus: "REQUEST_SENT" }); setNotice("친구 요청을 보냈어요."); void refresh();
+            });
+          }} />}
           {found.friendStatus === "FRIEND" && <Button label="1:1 대화 시작" disabled={busy || uncertain} onPress={() => { void run(signal => service.direct(found.userId, signal), room => openRoom(room.id), true); }} />}
         </View>}
       </View>

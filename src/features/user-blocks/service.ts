@@ -7,8 +7,10 @@ export interface UserBlock { id: string; user: FriendPerson; createdAt: string }
 export function parseUserBlock(value: unknown): UserBlock {
   const dto = record(value);
   const user = record(dto.blockedUser);
-  return { id: safeId(dto.id), user: { userId: safeId(user.userId), publicId: text(user.publicId), nickname: text(user.nickname) },
-    createdAt: text(dto.createdAt) };
+  return {
+    id: safeId(dto.id), user: { userId: safeId(user.userId), publicId: text(user.publicId), nickname: text(user.nickname) },
+    createdAt: text(dto.createdAt)
+  };
 }
 
 export function createUserBlockService(api: ReturnType<typeof createApiClient>) {

@@ -23,8 +23,10 @@ export function parseDeletionReceipt(value: unknown): DeletionReceipt {
     || !["translacat-dev", "translacat-preview", "translacat"].includes(text(dto.returnScheme))) {
     throw new ApiError(0, "INVALID_DELETION_RECEIPT");
   }
-  return { operationId: dto.operationId as string, receiptSecret: dto.receiptSecret as string,
-    expectedPublicId: dto.expectedPublicId as string, returnScheme: dto.returnScheme as DeletionReceipt["returnScheme"] };
+  return {
+    operationId: dto.operationId as string, receiptSecret: dto.receiptSecret as string,
+    expectedPublicId: dto.expectedPublicId as string, returnScheme: dto.returnScheme as DeletionReceipt["returnScheme"]
+  };
 }
 
 export function parseDeletionStatus(value: unknown, operationId: string): DeletionStatus {
@@ -36,8 +38,10 @@ export function parseDeletionStatus(value: unknown, operationId: string): Deleti
     || (dto.status === "COMPLETED" && (dto.completedAtUtc === null || dto.receiptExpiresAtUtc === null))) {
     throw new ApiError(0, "INVALID_DELETION_STATUS");
   }
-  return { operationId, status: dto.status as DeletionStatus["status"], requestedAtUtc: dto.requestedAtUtc,
-    completedAtUtc: dto.completedAtUtc as string | null, receiptExpiresAtUtc: dto.receiptExpiresAtUtc as string | null };
+  return {
+    operationId, status: dto.status as DeletionStatus["status"], requestedAtUtc: dto.requestedAtUtc,
+    completedAtUtc: dto.completedAtUtc as string | null, receiptExpiresAtUtc: dto.receiptExpiresAtUtc as string | null
+  };
 }
 
 export function deletionBrowserUrl(webBaseUrl: string, receipt: DeletionReceipt): string {

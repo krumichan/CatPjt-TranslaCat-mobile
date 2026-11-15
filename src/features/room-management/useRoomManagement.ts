@@ -27,19 +27,19 @@ export function useRoomManagement(roomId: string | null) {
     const ownedEpoch = ++epoch.current;
     const owned = createRoomManagementController(service, roomId, user.id, key,
       () => isActive() && isCurrentSession(sessionKey), state => setValue({ key, epoch: ownedEpoch, owner: lifetime, state }), 15000, {
-        connect: handlers => {
-          if (!runtime.apiBaseUrl) return () => {};
-          return connectRoom({
-            ...handlers, apiBaseUrl: runtime.apiBaseUrl, roomId,
-            accessToken: async () => {
-              // 토큰 조회 전후에 화면·로그인 세대를 확인해 이전 자격으로 연결하지 않는다.
-              if (!isActive() || !isCurrentSession(sessionKey)) return null;
-              const token = await accessToken();
-              return isActive() && isCurrentSession(sessionKey) ? token : null;
-            },
-          });
-        },
-      });
+      connect: handlers => {
+        if (!runtime.apiBaseUrl) return () => { };
+        return connectRoom({
+          ...handlers, apiBaseUrl: runtime.apiBaseUrl, roomId,
+          accessToken: async () => {
+            // 토큰 조회 전후에 화면·로그인 세대를 확인해 이전 자격으로 연결하지 않는다.
+            if (!isActive() || !isCurrentSession(sessionKey)) return null;
+            const token = await accessToken();
+            return isActive() && isCurrentSession(sessionKey) ? token : null;
+          },
+        });
+      },
+    });
     controller.current = owned;
     void owned.load();
     return () => {
@@ -51,6 +51,8 @@ export function useRoomManagement(roomId: string | null) {
 
   const ownsState = active && status === "signedIn" && value.key === key && value.owner === lifetime;
   // 같은 방으로 돌아오는 첫 렌더부터 이전 controller의 역할·차단 목록을 숨긴다.
-  return { state: !valid ? { ...emptyRoomManagement(), loading: false, error: "대화방 링크를 확인해 주세요." }
-    : ownsState ? value.state : emptyRoomManagement(), epoch: ownsState ? value.epoch : 0, controller, active, isActive };
+  return {
+    state: !valid ? { ...emptyRoomManagement(), loading: false, error: "대화방 링크를 확인해 주세요." }
+      : ownsState ? value.state : emptyRoomManagement(), epoch: ownsState ? value.epoch : 0, controller, active, isActive
+  };
 }

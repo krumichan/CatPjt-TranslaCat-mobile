@@ -51,13 +51,15 @@ export default function RoomMembersScreen({ roomId }: { roomId: string }) {
     if (!owner || disabled || !isActive()) return;
     const revision = owner.getState().revision;
     setReason("");
-    setConfirmation({ ...value, onConfirm: text => {
-      setConfirmation(null);
-      setReason("");
-      if (!isActive() || controller.current !== owner || owner.getState().revision !== revision
-        || !owner.getState().ready) return;
-      work(text);
-    } });
+    setConfirmation({
+      ...value, onConfirm: text => {
+        setConfirmation(null);
+        setReason("");
+        if (!isActive() || controller.current !== owner || owner.getState().revision !== revision
+          || !owner.getState().ready) return;
+        work(text);
+      }
+    });
   };
 
   return <Screen>
@@ -89,8 +91,14 @@ export default function RoomMembersScreen({ roomId }: { roomId: string }) {
                   role={member.role} mine={member.id === state.myMemberId} active={member.active} imageUrl={member.profileImageUrl} />
                 <View style={styles.actions}>
                   {member.id !== state.myMemberId && member.active && <View style={styles.actionSlot}><ManagementAction label="참여자 신고" secondary disabled={disabled}
-                    onPress={() => { if (isActive()) router.push({ pathname: "/chat/[roomId]/report", params: { roomId,
-                      ...(state.room?.roomType === "OPEN" ? { targetOpenChatMemberId: member.id } : { targetUserId: member.id }) } }); }} /></View>}
+                    onPress={() => {
+                      if (isActive()) router.push({
+                        pathname: "/chat/[roomId]/report", params: {
+                          roomId,
+                          ...(state.room?.roomType === "OPEN" ? { targetOpenChatMemberId: member.id } : { targetUserId: member.id })
+                        }
+                      });
+                    }} /></View>}
                   {actions.assignAdmin && <View style={styles.actionSlot}><ManagementAction label="관리자로 지정" secondary disabled={disabled}
                     onPress={() => ask({ title: "관리자로 지정할까요?", description: `${member.displayName}님에게 참여자 관리 권한을 부여해요.`, confirmLabel: "관리자로 지정" },
                       () => { void controller.current?.assignAdmin(member.id); })} /></View>}
@@ -101,8 +109,10 @@ export default function RoomMembersScreen({ roomId }: { roomId: string }) {
                     onPress={() => ask({ title: "방장을 위임할까요?", description: `${member.displayName}님이 새 방장이 되고, 나는 일반 참여자가 돼요. 방에서는 자동으로 나가지 않아요.`, confirmLabel: "방장 위임", danger: true },
                       () => { void controller.current?.transfer(member.id); })} /></View>}
                   {actions.ban && <View style={styles.actionSlot}><ManagementAction label="강퇴 · 재입장 차단" danger disabled={disabled}
-                    onPress={() => ask({ title: "강퇴하고 재입장을 차단할까요?", description: `${member.displayName}님을 이 방에서 내보내고 다시 참여하지 못하게 해요. 차단을 해제해도 자동으로 돌아오지는 않아요.`,
-                      confirmLabel: "강퇴 및 차단", danger: true, requireReason: true }, text => { void controller.current?.ban(member.id, text); })} /></View>}
+                    onPress={() => ask({
+                      title: "강퇴하고 재입장을 차단할까요?", description: `${member.displayName}님을 이 방에서 내보내고 다시 참여하지 못하게 해요. 차단을 해제해도 자동으로 돌아오지는 않아요.`,
+                      confirmLabel: "강퇴 및 차단", danger: true, requireReason: true
+                    }, text => { void controller.current?.ban(member.id, text); })} /></View>}
                 </View>
               </View>;
             })}

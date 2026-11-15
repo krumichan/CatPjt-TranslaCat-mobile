@@ -64,13 +64,13 @@ function AiProfileBody({ service, roomId, memberId, sessionKey, isActive, onRefr
     {loading && <ActivityIndicator accessibilityLabel="AI 프로필 불러오는 중" color={colors.chat} />}
     {error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
     {value && <View style={styles.card}>
-        <View style={styles.avatar}><Text style={styles.avatarLabel}>AI</Text></View>
-        <Text style={styles.name}>{value.profile.nickname}</Text>
-        <Text style={styles.copy}>{value.profile.bio || "아직 소개가 없어요."}</Text>
-        <Text style={styles.copy}>원문 언어 · {value.profile.originalLanguageCode}</Text>
-        {value.canMention ? <Button label={`${value.profile.nickname}와 대화하기`}
-          onPress={() => { if (isActive()) router.replace(`/chat/${roomId}?aiMention=${memberId}`); }} />
-          : <Text style={styles.copy}>이 방에서는 소유자와 관리자만 AI를 부를 수 있어요.</Text>}
+      <View style={styles.avatar}><Text style={styles.avatarLabel}>AI</Text></View>
+      <Text style={styles.name}>{value.profile.nickname}</Text>
+      <Text style={styles.copy}>{value.profile.bio || "아직 소개가 없어요."}</Text>
+      <Text style={styles.copy}>원문 언어 · {value.profile.originalLanguageCode}</Text>
+      {value.canMention ? <Button label={`${value.profile.nickname}와 대화하기`}
+        onPress={() => { if (isActive()) router.replace(`/chat/${roomId}?aiMention=${memberId}`); }} />
+        : <Text style={styles.copy}>이 방에서는 소유자와 관리자만 AI를 부를 수 있어요.</Text>}
     </View>}
     {!loading && <Button label="프로필 새로고침" secondary onPress={() => { if (isActive()) onRefresh(); }} />}
   </>;

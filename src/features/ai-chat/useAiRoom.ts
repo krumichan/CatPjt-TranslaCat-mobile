@@ -26,19 +26,19 @@ export function useAiRoom(roomId: string | null) {
     const owned = createAiRoomController(service, roomId, key,
       () => isActive() && isCurrentSession(sessionKey),
       state => setValue({ key, state, owner: lifetime }), {
-        connect: handlers => {
-          if (!runtime.apiBaseUrl) return () => {};
-          return connectRoom({
-            ...handlers, apiBaseUrl: runtime.apiBaseUrl, roomId,
-            accessToken: async () => {
-              // 토큰 조회 전후에 화면·로그인 세대를 확인해 이전 계정으로 연결하지 않는다.
-              if (!isActive() || !isCurrentSession(sessionKey)) return null;
-              const token = await accessToken();
-              return isActive() && isCurrentSession(sessionKey) ? token : null;
-            },
-          });
-        },
-      });
+      connect: handlers => {
+        if (!runtime.apiBaseUrl) return () => { };
+        return connectRoom({
+          ...handlers, apiBaseUrl: runtime.apiBaseUrl, roomId,
+          accessToken: async () => {
+            // 토큰 조회 전후에 화면·로그인 세대를 확인해 이전 계정으로 연결하지 않는다.
+            if (!isActive() || !isCurrentSession(sessionKey)) return null;
+            const token = await accessToken();
+            return isActive() && isCurrentSession(sessionKey) ? token : null;
+          },
+        });
+      },
+    });
     controller.current = owned;
     void owned.load();
     return () => {
@@ -49,6 +49,8 @@ export function useAiRoom(roomId: string | null) {
   }, [active, status, sessionKey, isCurrentSession, isActive, key, roomId, service, accessToken, lifetime]);
 
   // 같은 방으로 복귀하는 첫 렌더에서도 이전 controller의 persona·권한 캐시를 노출하지 않는다.
-  return { state: active && status === "signedIn" && value.key === key && value.owner === lifetime
-    ? value.state : emptyAiRoom(), controller, active, isActive };
+  return {
+    state: active && status === "signedIn" && value.key === key && value.owner === lifetime
+      ? value.state : emptyAiRoom(), controller, active, isActive
+  };
 }

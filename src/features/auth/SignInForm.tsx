@@ -60,7 +60,7 @@ export default function SignInForm() {
       const code = failure instanceof ApiError ? failure.code : "";
       setError(code === "MOBILE_AUTH_CANCELLED" ? "로그인을 취소했어요. 다시 시작할 수 있어요."
         : code === "API_NOT_CONFIGURED" ? "서버 연결이 준비되면 로그인할 수 있어요."
-        : "앱 로그인을 완료하지 못했어요. 앱에서 다시 시작해 주세요.");
+          : "앱 로그인을 완료하지 못했어요. 앱에서 다시 시작해 주세요.");
     } finally {
       setBusy(false);
     }
@@ -175,8 +175,10 @@ const styles = StyleSheet.create({
   form: { marginTop: 20, gap: 9 },
   accountLinks: { marginTop: 20, gap: 12 },
   label: { color: colors.ink, fontSize: 14, lineHeight: 21, fontWeight: "600" },
-  input: { minHeight: 54, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 1, borderColor: colors.blueLine,
-    borderRadius: 12, backgroundColor: colors.surface, color: colors.ink, fontSize: 16, marginBottom: 8 },
+  input: {
+    minHeight: 54, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 1, borderColor: colors.blueLine,
+    borderRadius: 12, backgroundColor: colors.surface, color: colors.ink, fontSize: 16, marginBottom: 8
+  },
   button: { marginTop: 8 },
   error: { color: colors.danger, backgroundColor: colors.dangerSoft, padding: 14, borderRadius: 12, marginTop: 16, fontSize: 14, lineHeight: 22 },
   note: { color: colors.muted, fontSize: 12, lineHeight: 21, marginTop: 20 },

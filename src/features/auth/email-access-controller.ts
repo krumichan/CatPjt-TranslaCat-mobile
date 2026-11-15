@@ -15,9 +15,11 @@ type State = EmailAccessFields & {
 export function createEmailAccessController({ mode, request, current, now = Date.now, timeoutMs = 20000 }: {
   mode: EmailAccessMode; request: Request; current: () => boolean; now?: () => number; timeoutMs?: number;
 }) {
-  let state: State = { email: "", code: "", password: "", confirmation: "", nickname: "", birthDate: "",
+  let state: State = {
+    email: "", code: "", password: "", confirmation: "", nickname: "", birthDate: "",
     busy: null, verified: false, expiresAt: 0, cooldownUntil: 0, error: null, message: null, completed: false,
-    errorField: null, errorAction: null, errorRevision: 0 };
+    errorField: null, errorAction: null, errorRevision: 0
+  };
   let challengeId: string | null = null;
   let proof: string | null = null;
   let revision = 0;
@@ -111,8 +113,10 @@ export function createEmailAccessController({ mode, request, current, now = Date
       await run("send", mode === "register" ? "/auth/email/challenges" : "/auth/password-reset/challenges", { email }, value => {
         const challenge = parseEmailChallenge(value);
         challengeId = challenge.challengeId;
-        publish({ expiresAt: now() + challenge.expiresIn * 1000, cooldownUntil: now() + challenge.resendAfterSeconds * 1000,
-          message: "인증번호를 보냈어요. 받은편지함과 스팸함을 확인해 주세요." });
+        publish({
+          expiresAt: now() + challenge.expiresIn * 1000, cooldownUntil: now() + challenge.resendAfterSeconds * 1000,
+          message: "인증번호를 보냈어요. 받은편지함과 스팸함을 확인해 주세요."
+        });
       });
     },
     async verify() {
@@ -143,24 +147,32 @@ export function createEmailAccessController({ mode, request, current, now = Date
       const verificationToken = proof;
       proof = null;
       challengeId = null;
-      const body = { email, password: state.password, verificationToken,
-        ...(mode === "register" ? { nickname: state.nickname.trim(), birthDate: state.birthDate } : {}) };
+      const body = {
+        email, password: state.password, verificationToken,
+        ...(mode === "register" ? { nickname: state.nickname.trim(), birthDate: state.birthDate } : {})
+      };
       publish({ verified: false, expiresAt: 0, password: "", confirmation: "" });
       await run("complete", mode === "register" ? "/auth/register" : "/auth/password-reset/complete", body, value => {
         parseEmailCompletion(value, mode);
         challengeId = null;
-        publish({ password: "", confirmation: "", code: "", verified: false, expiresAt: 0, completed: true,
-          message: mode === "register" ? "가입을 완료했어요. 새 계정으로 로그인해 주세요." : "비밀번호를 변경했어요. 기존 로그인은 해제돼요. 새 비밀번호로 로그인해 주세요." });
+        publish({
+          password: "", confirmation: "", code: "", verified: false, expiresAt: 0, completed: true,
+          message: mode === "register" ? "가입을 완료했어요. 새 계정으로 로그인해 주세요." : "비밀번호를 변경했어요. 기존 로그인은 해제돼요. 새 비밀번호로 로그인해 주세요."
+        });
       });
     },
     suspend(reset = false) {
       const interrupted = state.busy;
       invalidate();
       if (reset) { challengeId = null; proof = null; }
-      publish({ busy: null, password: "", confirmation: "", code: "",
+      publish({
+        busy: null, password: "", confirmation: "", code: "",
         ...(reset ? { verified: false, expiresAt: 0 } : {}),
-        ...(interrupted ? { error: "요청 결과를 확인하지 못했어요. 가입·변경 중이었다면 로그인으로 먼저 확인해 주세요.",
-          errorField: null, errorAction: interrupted, errorRevision: state.errorRevision + 1, message: null } : {}) });
+        ...(interrupted ? {
+          error: "요청 결과를 확인하지 못했어요. 가입·변경 중이었다면 로그인으로 먼저 확인해 주세요.",
+          errorField: null, errorAction: interrupted, errorRevision: state.errorRevision + 1, message: null
+        } : {})
+      });
     },
   };
 }
