@@ -50,6 +50,7 @@ function AccountIdentity({ disabled }: { disabled: boolean }) {
   );
 }
 
+/** 계정 작업과 이 기기의 알림 연결 상태를 표시한다. */
 export default function SettingsScreen() {
   const router = useRouter();
   const auth = useAuth();

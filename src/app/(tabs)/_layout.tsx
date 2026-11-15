@@ -47,8 +47,10 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "채팅", tabBarBadge: attentionCount ? (attentionCount > 99 ? "99+" : attentionCount) : undefined,
-        tabBarIcon: ({ color, focused }) => <NavigationIcon kind="chat" color={color} focused={focused} /> }} />
+      <Tabs.Screen name="index" options={{
+        title: "채팅", tabBarBadge: attentionCount ? (attentionCount > 99 ? "99+" : attentionCount) : undefined,
+        tabBarIcon: ({ color, focused }) => <NavigationIcon kind="chat" color={color} focused={focused} />
+      }} />
       <Tabs.Screen name="friends" options={{ title: "친구", tabBarIcon: ({ color, focused }) => <NavigationIcon kind="friends" color={color} focused={focused} /> }} />
       <Tabs.Screen name="open" options={{ title: "오픈채팅", tabBarIcon: ({ color, focused }) => <NavigationIcon kind="open" color={color} focused={focused} /> }} />
       <Tabs.Screen name="settings" options={{ title: "설정", tabBarIcon: ({ color, focused }) => <NavigationIcon kind="settings" color={color} focused={focused} /> }} />
