@@ -25,8 +25,10 @@ export default function InvitationInboxScreen({ notificationId }: { notification
     initialPageParam: null as string | null, getNextPageParam: page => page.hasNext ? page.nextCursorId ?? undefined : undefined,
     enabled: enabled && !notificationId, staleTime: 0, retry: false, refetchInterval: enabled ? 30000 : false,
   });
-  const summary = useQuery({ queryKey: invitationKeys.summary(auth.sessionKey), queryFn: ({ signal }) => service.summary(signal),
-    enabled: enabled && !notificationId, staleTime: 0, retry: false, refetchInterval: enabled ? 30000 : false });
+  const summary = useQuery({
+    queryKey: invitationKeys.summary(auth.sessionKey), queryFn: ({ signal }) => service.summary(signal),
+    enabled: enabled && !notificationId, staleTime: 0, retry: false, refetchInterval: enabled ? 30000 : false
+  });
   const items = [...new Map((listing.data?.pages.flatMap(page => page.items) ?? []).map(item => [item.id, item])).values()];
   const back = () => router.canGoBack() ? router.back() : router.replace("/");
 
@@ -122,6 +124,8 @@ const styles = StyleSheet.create({
   meta: { color: colors.blueDark, fontSize: 13, lineHeight: 21, fontWeight: "700" },
   link: { color: colors.blueDark, fontSize: 14, lineHeight: 22, fontWeight: "700" },
   error: { color: "#9E3542", fontSize: 13, lineHeight: 22 },
-  input: { minHeight: 50, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: 16,
-    paddingHorizontal: 15, paddingVertical: 13, color: colors.ink, fontSize: 14, lineHeight: 22 },
+  input: {
+    minHeight: 50, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: 16,
+    paddingHorizontal: 15, paddingVertical: 13, color: colors.ink, fontSize: 14, lineHeight: 22
+  },
 });

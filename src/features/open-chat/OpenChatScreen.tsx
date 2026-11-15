@@ -171,7 +171,9 @@ const styles = StyleSheet.create({
   roomMeta: { color: colors.blueDark, fontSize: 12, lineHeight: 20 },
   notice: { color: "#8E3442", fontSize: 13, lineHeight: 22 },
   join: { backgroundColor: colors.blue, borderRadius: 16, minHeight: 52, alignItems: "center", justifyContent: "center", padding: 14 },
-  joinLabel: { color: colors.surface, fontSize: 15, lineHeight: 23, fontWeight: "700",
-    alignSelf: "stretch", flexShrink: 0, textAlign: "center" },
+  joinLabel: {
+    color: colors.surface, fontSize: 15, lineHeight: 23, fontWeight: "700",
+    alignSelf: "stretch", flexShrink: 0, textAlign: "center"
+  },
   disabled: { opacity: 0.45 },
 });
