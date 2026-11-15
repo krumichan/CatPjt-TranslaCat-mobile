@@ -17,6 +17,8 @@ export const styles = StyleSheet.create({
   avatarText: { color: colors.blueDark, fontSize: 19, fontWeight: "700" },
   select: { minHeight: 44, minWidth: 58, borderRadius: 12, backgroundColor: colors.blueSoft, alignItems: "center", justifyContent: "center", padding: 10 },
   selected: { borderWidth: 2, borderColor: colors.blue },
-  selectText: { color: colors.blueDark, fontWeight: "700", fontSize: 13, lineHeight: 21,
-    alignSelf: "stretch", flexShrink: 0, textAlign: "center" },
+  selectText: {
+    color: colors.blueDark, fontWeight: "700", fontSize: 13, lineHeight: 21,
+    alignSelf: "stretch", flexShrink: 0, textAlign: "center"
+  },
 });
