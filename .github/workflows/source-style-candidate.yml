@@ -1,0 +1,24 @@
+name: Source style MOBILE candidate verification
+on:
+  push:
+    branches: [ci/source-style-20261115]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a137a1100a986ebd458a2a16abc45c8cb1aa023b
+          persist-credentials: false
+      - run: test "$(git rev-parse HEAD)" = "a137a1100a986ebd458a2a16abc45c8cb1aa023b"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run config:check
