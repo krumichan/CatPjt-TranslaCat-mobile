@@ -24,6 +24,7 @@ type RequestOptions = {
   signal?: AbortSignal;
 };
 
+/** 허용된 API 경로에 세션 인증을 적용하고 서버 응답을 앱의 오류 형식으로 전달한다. */
 export function createApiClient({
   baseUrl,
   accessToken,
