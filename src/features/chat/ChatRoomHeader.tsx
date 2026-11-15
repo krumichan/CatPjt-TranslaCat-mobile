@@ -73,8 +73,10 @@ export function ChatRoomHeader({ title, refreshing, onBack, onRefresh, onLatest,
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 6,
-    backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.line, flexShrink: 0 },
+  header: {
+    flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 6,
+    backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.line, flexShrink: 0
+  },
   title: { flex: 1, minWidth: 0, color: colors.ink, fontSize: 18, lineHeight: 26, fontWeight: "700" },
   iconButton: { width: 44, height: 44, flexShrink: 0, alignItems: "center", justifyContent: "center", borderRadius: 14 },
   back: { fontSize: 34, lineHeight: 38, color: colors.ink },

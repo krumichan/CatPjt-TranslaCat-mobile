@@ -26,6 +26,7 @@ function subscribeKeyboardVisibility(notify: () => void) {
 const keyboardVisible = () => Keyboard.isVisible();
 const keyboardHiddenOnServer = () => false;
 
+/** 계정과 방 범위를 확인하고 대화 목록·입력·읽음 처리의 진입점을 연결한다. */
 export default function ChatRoomScreen({ roomId }: { roomId: string }) {
   const keyboardOpen = useSyncExternalStore(subscribeKeyboardVisibility, keyboardVisible, keyboardHiddenOnServer);
   const auth = useAuth();
@@ -41,8 +42,10 @@ export default function ChatRoomScreen({ roomId }: { roomId: string }) {
 
   // 목록 배치와 읽음 판정은 같은 ref를 공유해 입력 포커스·키보드 전환에도 유지한다.
   const list = useRef<FlatList<ChatMessage>>(null);
-  const scroll = useChatScroll({ messages: state.messages, loading: state.loading, entryTarget: state.entryTarget,
-    active: chat.active, markVisible: chat.markVisible, setReadingReady: chat.setReadingReady }, list);
+  const scroll = useChatScroll({
+    messages: state.messages, loading: state.loading, entryTarget: state.entryTarget,
+    active: chat.active, markVisible: chat.markVisible, setReadingReady: chat.setReadingReady
+  }, list);
   const viewabilityConfig = useMemo(() => ({ viewAreaCoveragePercentThreshold: 25, minimumViewTime: 450 }), []);
 
   if (!valid || auth.status !== "signedIn") return (
@@ -87,43 +90,43 @@ export default function ChatRoomScreen({ roomId }: { roomId: string }) {
         {state.error && <Text accessibilityRole="alert" style={styles.error}>{state.error}</Text>}
         {state.loading ? <ActivityIndicator style={styles.loading} accessibilityLabel="대화 불러오는 중" color={colors.blue} /> : (
           <View style={styles.timeline}>
-          <FlatList
-            ref={list}
-            style={[styles.list, (!scroll.placed || verifyingAuthority) && styles.positioning]}
-            scrollEnabled={scroll.placed && !verifyingAuthority}
-            pointerEvents={scroll.placed && !verifyingAuthority ? "auto" : "none"}
-            accessibilityElementsHidden={!scroll.placed || verifyingAuthority}
-            importantForAccessibility={scroll.placed && !verifyingAuthority ? "auto" : "no-hide-descendants"}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
-            data={state.messages}
-            keyExtractor={(message) => message.id}
-            renderItem={renderMessage}
-            contentContainerStyle={styles.messages}
-            maintainVisibleContentPosition={scroll.placed ? { minIndexForVisible: 0 } : undefined}
-            onViewableItemsChanged={scroll.onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            onLayout={scroll.onLayout}
-            onContentSizeChange={scroll.onContentSizeChange}
-            onScroll={scroll.onScroll}
-            onScrollBeginDrag={scroll.onScrollBeginDrag}
-            onScrollEndDrag={scroll.onScrollEndDrag}
-            onTouchMove={scroll.onScrollBeginDrag}
-            onTouchEnd={scroll.onTouchEnd}
-            onTouchCancel={scroll.onTouchCancel}
-            onMomentumScrollBegin={scroll.onMomentumScrollBegin}
-            onMomentumScrollEnd={scroll.onMomentumScrollEnd}
-            {...(Platform.OS === "web" ? { onWheel: scroll.onWheel } : {})}
-            onScrollToIndexFailed={scroll.onScrollToIndexFailed}
-            scrollEventThrottle={16}
-            ListHeaderComponent={state.hasMore ? <Button label={state.loadingMore ? "이전 대화 불러오는 중…" : "이전 대화 보기"} secondary onPress={() => { void chat.loadOlder(); }} /> : undefined}
-            ListEmptyComponent={<Text style={styles.empty}>{state.room ? "첫 메시지를 보내 보세요." : "대화방 참여 상태를 확인해 주세요."}</Text>}
-          />
-          {(!scroll.placed || verifyingAuthority) && <View style={styles.positionStatus} pointerEvents="none">
-            {(verifyingAuthority || (state.entryTarget && !scroll.positionError)) && <ActivityIndicator color={colors.blue} />}
-            <Text style={styles.notice}>{verifyingAuthority ? "방 참여 상태를 확인하고 있어요…"
-              : scroll.positionError ?? (state.entryTarget ? "읽던 위치로 이동하고 있어요…" : "읽던 위치를 다시 확인하거나 최신 메시지로 이동해 주세요.")}</Text>
-          </View>}
+            <FlatList
+              ref={list}
+              style={[styles.list, (!scroll.placed || verifyingAuthority) && styles.positioning]}
+              scrollEnabled={scroll.placed && !verifyingAuthority}
+              pointerEvents={scroll.placed && !verifyingAuthority ? "auto" : "none"}
+              accessibilityElementsHidden={!scroll.placed || verifyingAuthority}
+              importantForAccessibility={scroll.placed && !verifyingAuthority ? "auto" : "no-hide-descendants"}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+              data={state.messages}
+              keyExtractor={(message) => message.id}
+              renderItem={renderMessage}
+              contentContainerStyle={styles.messages}
+              maintainVisibleContentPosition={scroll.placed ? { minIndexForVisible: 0 } : undefined}
+              onViewableItemsChanged={scroll.onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              onLayout={scroll.onLayout}
+              onContentSizeChange={scroll.onContentSizeChange}
+              onScroll={scroll.onScroll}
+              onScrollBeginDrag={scroll.onScrollBeginDrag}
+              onScrollEndDrag={scroll.onScrollEndDrag}
+              onTouchMove={scroll.onScrollBeginDrag}
+              onTouchEnd={scroll.onTouchEnd}
+              onTouchCancel={scroll.onTouchCancel}
+              onMomentumScrollBegin={scroll.onMomentumScrollBegin}
+              onMomentumScrollEnd={scroll.onMomentumScrollEnd}
+              {...(Platform.OS === "web" ? { onWheel: scroll.onWheel } : {})}
+              onScrollToIndexFailed={scroll.onScrollToIndexFailed}
+              scrollEventThrottle={16}
+              ListHeaderComponent={state.hasMore ? <Button label={state.loadingMore ? "이전 대화 불러오는 중…" : "이전 대화 보기"} secondary onPress={() => { void chat.loadOlder(); }} /> : undefined}
+              ListEmptyComponent={<Text style={styles.empty}>{state.room ? "첫 메시지를 보내 보세요." : "대화방 참여 상태를 확인해 주세요."}</Text>}
+            />
+            {(!scroll.placed || verifyingAuthority) && <View style={styles.positionStatus} pointerEvents="none">
+              {(verifyingAuthority || (state.entryTarget && !scroll.positionError)) && <ActivityIndicator color={colors.blue} />}
+              <Text style={styles.notice}>{verifyingAuthority ? "방 참여 상태를 확인하고 있어요…"
+                : scroll.positionError ?? (state.entryTarget ? "읽던 위치로 이동하고 있어요…" : "읽던 위치를 다시 확인하거나 최신 메시지로 이동해 주세요.")}</Text>
+            </View>}
           </View>
         )}
         {state.authorityReady && (!scroll.atLatest || !scroll.placed) && <Pressable accessibilityRole="button" onPress={goToLatest} style={styles.latest}>

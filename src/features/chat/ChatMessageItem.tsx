@@ -15,6 +15,7 @@ interface ChatMessageItemProps {
   onReport: (messageId: string) => void;
 }
 
+/** 메시지 공개 상태와 언어 설정에 맞춰 발신자·원문·번역을 표시한다. */
 export function ChatMessageItem({ message, currentUserId, currentOpenMemberId, roomType, language,
   firstUnreadMessageId, onOpenAiProfile, onReport }: ChatMessageItemProps) {
   // 계정·오픈채팅 별칭을 구분하고, 가려진 메시지의 프로필 동작과 번역을 노출하지 않는다.
