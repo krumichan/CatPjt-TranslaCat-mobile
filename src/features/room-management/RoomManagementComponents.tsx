@@ -18,7 +18,7 @@ export function ManagementAction({ label, onPress, disabled = false, danger = fa
 }) {
   return <Pressable accessibilityRole="button" accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
     style={({ pressed }) => [styles.action, secondary && styles.secondary, danger && styles.dangerAction,
-      disabled && styles.disabled, pressed && styles.pressed]}>
+    disabled && styles.disabled, pressed && styles.pressed]}>
     <Text style={[styles.actionText, secondary && styles.secondaryText, danger && styles.dangerText]}>{label}</Text>
   </Pressable>;
 }
@@ -92,8 +92,10 @@ export const managementStyles = StyleSheet.create({
   copy: { color: colors.muted, fontSize: 14, lineHeight: 23 },
   small: { color: colors.muted, fontSize: 12, lineHeight: 20 },
   label: { color: colors.ink, fontSize: 14, lineHeight: 22, fontWeight: "700" },
-  input: { borderWidth: 1, borderColor: colors.line, borderRadius: 14, backgroundColor: colors.background,
-    color: colors.ink, minHeight: 48, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, lineHeight: 23 },
+  input: {
+    borderWidth: 1, borderColor: colors.line, borderRadius: 14, backgroundColor: colors.background,
+    color: colors.ink, minHeight: 48, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15, lineHeight: 23
+  },
   row: { flexDirection: "row", alignItems: "center", gap: 10 },
   grow: { flex: 1, minWidth: 0 },
   member: { borderTopWidth: 1, borderColor: colors.line, paddingTop: 16, gap: 12 },
@@ -105,13 +107,17 @@ const styles = StyleSheet.create({
   card: { padding: 20, gap: 14, borderRadius: 22, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface },
   sectionTitle: { color: colors.ink, fontSize: 19, lineHeight: 28, fontWeight: "700" },
   copy: { color: colors.muted, fontSize: 14, lineHeight: 23 },
-  action: { minHeight: 48, borderWidth: 1, borderColor: colors.blue, borderRadius: 14,
-    paddingHorizontal: 16, paddingVertical: 12, justifyContent: "center", alignItems: "center", backgroundColor: colors.blue },
+  action: {
+    minHeight: 48, borderWidth: 1, borderColor: colors.blue, borderRadius: 14,
+    paddingHorizontal: 16, paddingVertical: 12, justifyContent: "center", alignItems: "center", backgroundColor: colors.blue
+  },
   secondary: { backgroundColor: colors.surface, borderColor: colors.blueLine },
   dangerAction: { backgroundColor: colors.dangerSoft, borderColor: colors.danger },
   // 버튼의 최종 폭으로 줄을 계산하고, 여러 줄이 된 글자의 높이를 줄이지 않는다.
-  actionText: { color: colors.surface, fontSize: 14, lineHeight: 22, fontWeight: "700", textAlign: "center",
-    alignSelf: "stretch", flexShrink: 0 },
+  actionText: {
+    color: colors.surface, fontSize: 14, lineHeight: 22, fontWeight: "700", textAlign: "center",
+    alignSelf: "stretch", flexShrink: 0
+  },
   secondaryText: { color: colors.blueDark },
   dangerText: { color: colors.danger },
   disabled: { opacity: 0.5 },
